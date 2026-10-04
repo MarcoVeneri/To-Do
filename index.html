@@ -10,11 +10,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="To Do">
   <title>To Do</title>
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="apple-touch-icon" href="./icon.svg">
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest?v=2">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=2">
+  <link rel="icon" sizes="192x192" href="./icon-192.png?v=2" type="image/png">
   <link rel="stylesheet" href="./styles.css?v=1.0.1">
   <link rel="stylesheet" href="./theme.css?v=1.0.1">
+  <link rel="stylesheet" href="./urgent.css?v=1.0.2">
   <script src="./config.js?v=1.0.0"></script>
 </head>
 <body>
@@ -31,6 +32,13 @@
 
     <form id="addForm" class="addRow" autocomplete="off">
       <input id="noteInput" maxlength="500" type="text" inputmode="text" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota">
+      <button id="urgentBtn" class="urgentBtn" type="button" aria-pressed="false" aria-label="Segna la nuova nota come urgente" title="Urgente">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 15V9a4 4 0 0 1 8 0v6"/>
+          <path d="M6 15h12l1.5 3H4.5L6 15Z"/>
+          <path d="M12 2V1M4.9 4.9 4.2 4.2M19.1 4.9l.7-.7M2 10H1M23 10h-1"/>
+        </svg>
+      </button>
       <button id="addBtn" class="addBtn" type="submit" aria-label="Aggiungi nota">+</button>
     </form>
 
@@ -82,6 +90,6 @@
 
   <div id="toast" class="toast" role="status"></div>
 
-  <script src="./app.js?v=1.0.0"></script>
+  <script src="./app.js?v=1.0.2"></script>
 </body>
 </html>
