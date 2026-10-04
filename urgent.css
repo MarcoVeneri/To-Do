@@ -110,3 +110,17 @@ html,body{max-width:100%;overflow-x:hidden}
   }
   .taskRow.urgent .taskText{color:#ffaaa5}
 }
+
+/* In elenco l'urgenza resta il semplice pallino rosso; la sirena è solo accanto al + */
+.urgentToggle.urgentSiren svg{display:none}
+.urgentToggle.urgentSiren::after{
+  content:"";
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:var(--red);
+  box-shadow:0 0 0 4px rgba(255,69,58,.07);
+}
+@media(max-width:560px){
+  .urgentToggle.urgentSiren::after{width:10px;height:10px}
+}
