@@ -38,10 +38,56 @@
 }
 .taskRow.urgent .taskText{font-weight:700;color:#a92d27}
 
+/* iPhone: keep every control inside the safe viewport */
+html,body{max-width:100%;overflow-x:hidden}
+.app{width:100%;max-width:760px;min-width:0;overflow-x:hidden}
+.header,.addRow{width:100%;max-width:100%;min-width:0}
+.header>*{min-width:0}
+.addRow>*{min-width:0}
+.addRow input{min-width:0;width:100%;max-width:100%}
+.connectionBtn{flex:0 0 42px;max-width:42px}
+
 @media(max-width:560px){
-  .addRow{grid-template-columns:minmax(0,1fr) 48px 54px;gap:8px}
-  .urgentBtn{width:48px;height:54px;border-radius:16px}
-  .urgentBtn svg{width:23px;height:23px}
+  body{
+    padding-left:max(10px,env(safe-area-inset-left));
+    padding-right:max(10px,env(safe-area-inset-right));
+  }
+  .app{padding-left:0;padding-right:0}
+  .header{padding-left:2px;padding-right:2px}
+  .addRow{
+    grid-template-columns:minmax(0,1fr) 44px 50px;
+    gap:7px;
+  }
+  .urgentBtn{
+    width:44px;
+    min-width:44px;
+    max-width:44px;
+    height:52px;
+    border-radius:15px;
+  }
+  .urgentBtn svg{width:22px;height:22px}
+  .addBtn{
+    width:50px;
+    min-width:50px;
+    max-width:50px;
+    height:52px;
+    border-radius:15px;
+  }
+  .addRow input{
+    height:52px;
+    padding-left:14px;
+    padding-right:12px;
+  }
+}
+
+@media(max-width:390px){
+  .addRow{
+    grid-template-columns:minmax(0,1fr) 42px 48px;
+    gap:6px;
+  }
+  .urgentBtn{width:42px;min-width:42px;max-width:42px;height:50px}
+  .addBtn{width:48px;min-width:48px;max-width:48px;height:50px}
+  .addRow input{height:50px;font-size:14.5px}
 }
 
 @media(prefers-color-scheme:dark){
