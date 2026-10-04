@@ -1,5 +1,5 @@
-const CACHE="marco-todo-v1-0-0";
-const SHELL=["./","./index.html","./styles.css?v=1.0.0","./config.js?v=1.0.0","./app.js?v=1.0.0","./manifest.webmanifest","./icon.svg"];
+const CACHE="marco-todo-v1-0-1";
+const SHELL=["./","./index.html","./styles.css?v=1.0.1","./theme.css?v=1.0.1","./config.js?v=1.0.0","./app.js?v=1.0.0","./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)));
