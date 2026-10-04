@@ -3,6 +3,7 @@
 
 const CFG=window.TODO_CONFIG||{};
 const TOKEN_KEY="todo_shared_token";
+const TOKEN_COOKIE="todo_sync_token";
 const SHARED_TOKEN_KEYS=["spesa_shared_token","alice-job-radar-access-token-v1"];
 const CACHE_KEY="todo_items_cache_v1";
 const $=s=>document.querySelector(s);
@@ -42,32 +43,49 @@ function setAddUrgent(value){
   ui.urgentBtn.setAttribute("aria-label",addUrgent?"Nuova nota urgente attiva":"Segna la nuova nota come urgente");
   ui.urgentBtn.title=addUrgent?"Urgente attiva":"Urgente";
 }
+function readTokenCookie(){
+  try{
+    const prefix=TOKEN_COOKIE+"=";
+    const part=document.cookie.split("; ").find(v=>v.startsWith(prefix));
+    return part?decodeURIComponent(part.slice(prefix.length)).trim():"";
+  }catch(e){return ""}
+}
+function writeTokenCookie(v){
+  try{
+    if(!v)return;
+    document.cookie=TOKEN_COOKIE+"="+encodeURIComponent(v)+"; Max-Age=31536000; Path=/To-Do/; SameSite=Lax; Secure";
+  }catch(e){}
+}
 
 function ingestHash(){
   const p=new URLSearchParams(location.hash.replace(/^#/,""));
   const k=(p.get("key")||"").trim();
   if(k){
-    try{localStorage.setItem(TOKEN_KEY,k)}catch(e){}
+    storeToken(k);
     history.replaceState(null,"",location.pathname+location.search);
   }
 }
 function resolveToken(){
   try{
     let t=(localStorage.getItem(TOKEN_KEY)||"").trim();
-    if(t)return t;
+    if(t){writeTokenCookie(t);return t}
+    t=readTokenCookie();
+    if(t){localStorage.setItem(TOKEN_KEY,t);return t}
     for(const key of SHARED_TOKEN_KEYS){
       t=(localStorage.getItem(key)||"").trim();
       if(t){
         localStorage.setItem(TOKEN_KEY,t);
+        writeTokenCookie(t);
         return t;
       }
     }
   }catch(e){}
-  return "";
+  return readTokenCookie();
 }
 function storeToken(v){
   token=(v||"").trim();
   try{localStorage.setItem(TOKEN_KEY,token)}catch(e){}
+  writeTokenCookie(token);
 }
 
 function headers(){
@@ -94,9 +112,10 @@ function completedItems(){
   return items.filter(x=>x.completed).sort((a,b)=>String(b.completed_at||"").localeCompare(String(a.completed_at||"")));
 }
 
+const SIREN_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 15V9a4 4 0 0 1 8 0v6"/><path d="M6 15h12l1.5 3H4.5L6 15Z"/><path d="M12 2V1M4.9 4.9 4.2 4.2M19.1 4.9l.7-.7M2 10H1M23 10h-1"/></svg>';
 function activeRow(x){
   return `<article class="taskRow ${x.urgent?"urgent":""}" data-id="${esc(x.id)}">
-    <button class="urgentToggle" type="button" data-urgent="${esc(x.id)}" aria-label="${x.urgent?"Togli urgenza":"Segna urgente"}" title="${x.urgent?"Togli urgenza":"Segna urgente"}"><span class="urgentDot"></span></button>
+    <button class="urgentToggle ${x.urgent?"urgentSiren":""}" type="button" data-urgent="${esc(x.id)}" aria-label="${x.urgent?"Togli urgenza":"Segna urgente"}" title="${x.urgent?"Togli urgenza":"Segna urgente"}">${x.urgent?SIREN_SVG:'<span class="urgentDot"></span>'}</button>
     <div class="taskText">${esc(x.note)}</div>
     <button class="completeBtn" type="button" data-complete="${esc(x.id)}" aria-label="Segna come completata" title="Completata"><span class="checkCircle"></span></button>
   </article>`;
@@ -135,14 +154,14 @@ async function refresh({silent=false}={}){
     saveCache();
     render();
     setStatus("Sincronizzato");
+    writeTokenCookie(token);
     return true;
   }catch(e){
     console.warn(e);
     const cached=loadCache();
     if(cached.length||!items.length){items=cached;render()}
     if(e.status===401||e.status===403){
-      setStatus("Codice non valido");
-      if(!silent)openSetup("Il codice privato non è valido.");
+      setStatus("Sincronizzazione da configurare");
     }else{
       setStatus(navigator.onLine?"Errore sincronizzazione":"Offline");
       if(!silent)toast("Connessione non disponibile");
@@ -153,7 +172,8 @@ async function refresh({silent=false}={}){
 
 async function addItem(){
   const note=ui.noteInput.value.trim();
-  if(!note||!token)return;
+  if(!note){return}
+  if(!token){setStatus("Sincronizzazione da configurare");openSetup("");return}
   ui.addBtn.disabled=true;
   ui.urgentBtn.disabled=true;
   try{
@@ -244,7 +264,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden&&token)ref
 window.addEventListener("online",()=>{if(token)refresh({silent:true})});
 
 if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=1.0.2",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=1.0.3",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
 }
 
 ingestHash();
@@ -252,7 +272,7 @@ token=resolveToken();
 items=loadCache();
 setAddUrgent(false);
 render();
-if(!token){setStatus("Sincronizzazione da configurare");openSetup()}
+if(!token){setStatus("Sincronizzazione da configurare")}
 else refresh();
 setInterval(()=>{if(!document.hidden&&token)refresh({silent:true})},5000);
 
