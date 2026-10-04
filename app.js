@@ -8,7 +8,7 @@ const CACHE_KEY="todo_items_cache_v1";
 const $=s=>document.querySelector(s);
 
 const ui={
-  addForm:$("#addForm"),noteInput:$("#noteInput"),addBtn:$("#addBtn"),
+  addForm:$("#addForm"),noteInput:$("#noteInput"),urgentBtn:$("#urgentBtn"),addBtn:$("#addBtn"),
   activeList:$("#activeList"),completedList:$("#completedList"),emptyActive:$("#emptyActive"),
   completedSection:$("#completedSection"),deleteCompletedBtn:$("#deleteCompletedBtn"),
   syncStatus:$("#syncStatus"),connectionBtn:$("#connectionBtn"),
@@ -20,6 +20,7 @@ const ui={
 let token="";
 let items=[];
 let loading=false;
+let addUrgent=false;
 let toastTimer=null;
 
 function esc(v){
@@ -34,6 +35,13 @@ function toast(msg){
 function setStatus(text){ui.syncStatus.textContent=text}
 function saveCache(){try{localStorage.setItem(CACHE_KEY,JSON.stringify(items))}catch(e){}}
 function loadCache(){try{return JSON.parse(localStorage.getItem(CACHE_KEY)||"[]")}catch(e){return[]}}
+function setAddUrgent(value){
+  addUrgent=!!value;
+  ui.urgentBtn.classList.toggle("active",addUrgent);
+  ui.urgentBtn.setAttribute("aria-pressed",addUrgent?"true":"false");
+  ui.urgentBtn.setAttribute("aria-label",addUrgent?"Nuova nota urgente attiva":"Segna la nuova nota come urgente");
+  ui.urgentBtn.title=addUrgent?"Urgente attiva":"Urgente";
+}
 
 function ingestHash(){
   const p=new URLSearchParams(location.hash.replace(/^#/,""));
@@ -147,15 +155,20 @@ async function addItem(){
   const note=ui.noteInput.value.trim();
   if(!note||!token)return;
   ui.addBtn.disabled=true;
+  ui.urgentBtn.disabled=true;
   try{
-    await rpc("todo_add_item",{p_token:token,p_note:note,p_urgent:false});
+    await rpc("todo_add_item",{p_token:token,p_note:note,p_urgent:addUrgent});
     ui.noteInput.value="";
+    setAddUrgent(false);
     await refresh({silent:true});
     setStatus("Sincronizzato");
     ui.noteInput.focus();
   }catch(e){
     toast("Non riesco ad aggiungere la nota");
-  }finally{ui.addBtn.disabled=false}
+  }finally{
+    ui.addBtn.disabled=false;
+    ui.urgentBtn.disabled=false;
+  }
 }
 
 async function toggleUrgent(id){
@@ -218,6 +231,7 @@ function openDeleteConfirm(){ui.confirmOverlay.hidden=false}
 function closeDeleteConfirm(){ui.confirmOverlay.hidden=true}
 
 ui.addForm.addEventListener("submit",e=>{e.preventDefault();addItem()});
+ui.urgentBtn.addEventListener("click",()=>setAddUrgent(!addUrgent));
 ui.deleteCompletedBtn.addEventListener("click",openDeleteConfirm);
 ui.cancelDeleteBtn.addEventListener("click",closeDeleteConfirm);
 ui.confirmDeleteBtn.addEventListener("click",deleteCompleted);
@@ -230,12 +244,13 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden&&token)ref
 window.addEventListener("online",()=>{if(token)refresh({silent:true})});
 
 if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=1.0.0",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=1.0.2",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
 }
 
 ingestHash();
 token=resolveToken();
 items=loadCache();
+setAddUrgent(false);
 render();
 if(!token){setStatus("Sincronizzazione da configurare");openSetup()}
 else refresh();
