@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f9fc">
+  <meta name="color-scheme" content="light">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="To Do">
+  <title>To Do</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css?v=1.0.0">
+  <script src="./config.js?v=1.0.0"></script>
+</head>
+<body>
+  <main class="app" aria-live="polite">
+    <header class="header">
+      <div>
+        <h1>To Do</h1>
+        <div id="syncStatus" class="syncStatus">Sincronizzazione…</div>
+      </div>
+      <button id="connectionBtn" class="connectionBtn" type="button" aria-label="Impostazioni sincronizzazione" title="Sincronizzazione">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M21 4v5h-5"/><path d="M21 9a9 9 0 0 0-3.2-4.2"/></svg>
+      </button>
+    </header>
+
+    <form id="addForm" class="addRow" autocomplete="off">
+      <input id="noteInput" maxlength="500" type="text" inputmode="text" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota">
+      <button id="addBtn" class="addBtn" type="submit" aria-label="Aggiungi nota">+</button>
+    </form>
+
+    <section class="todoSection" aria-label="Da fare">
+      <div id="activeList" class="list"></div>
+      <div id="emptyActive" class="emptyState" hidden>
+        <div class="emptyIcon">✓</div>
+        <strong>Tutto fatto</strong>
+        <span>Aggiungi una nuova cosa da ricordare.</span>
+      </div>
+    </section>
+
+    <section id="completedSection" class="completedSection" aria-label="Completate">
+      <div class="completedHead">
+        <h2>Completate</h2>
+        <button id="deleteCompletedBtn" class="deleteCompletedBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>
+          <span>Elimina completate</span>
+        </button>
+      </div>
+      <div id="completedList" class="list completedList"></div>
+    </section>
+  </main>
+
+  <div id="setupOverlay" class="overlay" hidden>
+    <section class="modal setupModal" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+      <div class="modalIcon">✓</div>
+      <h2 id="setupTitle">Attiva la sincronizzazione</h2>
+      <p>Usa lo stesso codice privato della tua Lista Spesa. Rimane salvato solo su questo dispositivo.</p>
+      <input id="tokenInput" class="tokenInput" type="password" autocomplete="off" placeholder="Codice privato">
+      <div id="setupMessage" class="setupMessage"></div>
+      <button id="saveTokenBtn" class="primaryBtn" type="button">Salva e sincronizza</button>
+    </section>
+  </div>
+
+  <div id="confirmOverlay" class="overlay" hidden>
+    <section class="modal confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="trashCircle">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>
+      </div>
+      <h2 id="confirmTitle">Eliminare le completate?</h2>
+      <p>Le attività completate verranno eliminate definitivamente.</p>
+      <div class="confirmActions">
+        <button id="cancelDeleteBtn" class="secondaryBtn" type="button">Annulla</button>
+        <button id="confirmDeleteBtn" class="dangerBtn" type="button">Elimina tutto</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="./app.js?v=1.0.0"></script>
+</body>
+</html>
