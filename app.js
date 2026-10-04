@@ -53,7 +53,7 @@ function readTokenCookie(){
 function writeTokenCookie(v){
   try{
     if(!v)return;
-    document.cookie=TOKEN_COOKIE+"="+encodeURIComponent(v)+"; Max-Age=31536000; Path=/To-Do/; SameSite=Lax; Secure";
+    document.cookie=TOKEN_COOKIE+"="+encodeURIComponent(v)+"; Max-Age=315360000; Path=/To-Do/; SameSite=Lax; Secure";
   }catch(e){}
 }
 
@@ -173,7 +173,11 @@ async function refresh({silent=false}={}){
 async function addItem(){
   const note=ui.noteInput.value.trim();
   if(!note){return}
-  if(!token){setStatus("Sincronizzazione da configurare");openSetup("");return}
+  if(!token){
+    setStatus("Sincronizzazione da configurare");
+    toast("Sincronizzazione non configurata");
+    return;
+  }
   ui.addBtn.disabled=true;
   ui.urgentBtn.disabled=true;
   try{
@@ -264,7 +268,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden&&token)ref
 window.addEventListener("online",()=>{if(token)refresh({silent:true})});
 
 if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=1.0.3",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=1.0.4",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
 }
 
 ingestHash();
