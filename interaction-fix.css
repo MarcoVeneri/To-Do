@@ -11,21 +11,22 @@
 @media(max-width:560px){
   .urgentToggle.urgentSiren::after{width:10px;height:10px}
 
-  /* iPhone: 16px evita lo zoom automatico di Safari quando l'input prende il focus */
+  /* iPhone: evita lo zoom automatico di Safari quando l'input prende il focus */
   .addRow input{font-size:16px!important}
 
-  /* Durante la scrittura il composer scende in basso, subito sopra la tastiera */
-  body.noteEntryActive .addRow{
-    position:fixed;
+  /* La barra di inserimento resta SEMPRE fissa in basso */
+  .app{padding-bottom:112px!important}
+  .addRow{
+    position:fixed!important;
     z-index:80;
     left:max(10px,env(safe-area-inset-left));
     right:max(10px,env(safe-area-inset-right));
-    top:var(--todo-composer-top,auto);
-    bottom:auto;
+    bottom:max(8px,env(safe-area-inset-bottom));
+    top:auto;
     width:auto!important;
     max-width:none!important;
     min-width:0;
-    margin:0;
+    margin:0!important;
     padding:8px;
     border:1px solid rgba(110,130,160,.22);
     border-radius:20px;
@@ -34,16 +35,21 @@
     backdrop-filter:blur(18px);
     -webkit-backdrop-filter:blur(18px);
   }
-  body.noteEntryActive .addRow>*{min-width:0}
-  body.noteEntryActive .addRow input{
+  .addRow>*{min-width:0}
+  .addRow input{
     width:100%!important;
     max-width:100%!important;
-    font-size:16px!important;
+  }
+
+  /* Con tastiera aperta resta subito sopra la tastiera */
+  body.noteEntryActive .addRow{
+    top:var(--todo-composer-top,auto);
+    bottom:auto;
   }
 }
 
 @media(max-width:560px) and (prefers-color-scheme:dark){
-  body.noteEntryActive .addRow{
+  .addRow{
     background:rgba(8,17,31,.94);
     border-color:rgba(130,150,180,.24);
   }
