@@ -1,5 +1,5 @@
-const CACHE="marco-todo-v1-0-7";
-const SHELL=["./","./index.html","./styles.css?v=1.0.1","./theme.css?v=1.0.1","./urgent.css?v=1.0.4","./interaction-fix.css?v=1.0.0","./config.js?v=1.0.0","./app.js?v=1.0.4","./interaction-fix.js?v=1.0.0","./manifest.webmanifest?v=2","./apple-touch-icon.png?v=2","./icon-192.png?v=2","./icon-512.png?v=2"];
+const CACHE="marco-todo-v1-0-8";
+const SHELL=["./","./index.html","./styles.css?v=1.0.1","./theme.css?v=1.0.1","./urgent.css?v=1.0.4","./interaction-fix.css?v=1.0.1","./config.js?v=1.0.0","./app.js?v=1.0.4","./interaction-fix.js?v=1.0.1","./manifest.webmanifest?v=2","./apple-touch-icon.png?v=2","./icon-192.png?v=2","./icon-512.png?v=2"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)));
