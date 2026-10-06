@@ -1,0 +1,204 @@
+/* Desktop / Edge enhancements. Mobile behavior stays unchanged. */
+@media (min-width:820px){
+  body{
+    padding-left:clamp(24px,4vw,64px);
+    padding-right:clamp(24px,4vw,64px);
+  }
+  .app{
+    width:min(100%,960px)!important;
+    max-width:960px!important;
+  }
+  .header h1{
+    font-size:clamp(44px,4.2vw,58px);
+  }
+  .addRow input,
+  .urgentBtn,
+  .addBtn{
+    height:60px;
+  }
+  .taskRow,
+  .completedRow{
+    transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease,opacity .15s ease;
+  }
+}
+
+@media (min-width:1120px){
+  body{
+    display:block;
+    padding-top:36px;
+    padding-bottom:36px;
+  }
+
+  .app{
+    width:min(100%,1180px)!important;
+    max-width:1180px!important;
+    display:grid;
+    grid-template-columns:minmax(0,1.16fr) minmax(360px,.84fr);
+    grid-template-areas:
+      "header header"
+      "composer composer"
+      "active completed";
+    column-gap:30px;
+    row-gap:0;
+    padding:30px 34px 34px!important;
+    border-radius:30px;
+    background:rgba(255,255,255,.34);
+    box-shadow:0 24px 70px rgba(27,43,75,.055);
+  }
+
+  .header{
+    grid-area:header;
+    align-items:center;
+    margin-bottom:22px;
+  }
+
+  .connectionBtn{
+    width:44px;
+    height:44px;
+  }
+
+  .addRow{
+    grid-area:composer;
+    position:static!important;
+    inset:auto!important;
+    width:100%!important;
+    max-width:none!important;
+    margin:0 0 26px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    grid-template-columns:minmax(0,1fr) 54px 62px;
+    gap:10px;
+  }
+
+  .addRow input{
+    height:62px;
+    border-radius:18px;
+    padding:0 22px;
+    font-size:17px;
+  }
+
+  .urgentBtn{
+    width:54px;
+    height:62px;
+    border-radius:18px;
+  }
+
+  .addBtn{
+    width:62px;
+    height:62px;
+    border-radius:18px;
+    font-size:34px;
+  }
+
+  .todoSection{
+    grid-area:active;
+    min-width:0;
+  }
+
+  .completedSection{
+    grid-area:completed;
+    min-width:0;
+    margin-top:0;
+    padding-top:0;
+    padding-left:30px;
+    border-top:0;
+    border-left:1px solid rgba(215,222,232,.82);
+  }
+
+  .list{
+    gap:10px;
+  }
+
+  .taskRow{
+    min-height:60px;
+    grid-template-columns:38px minmax(0,1fr) 48px;
+    border-radius:18px;
+    padding-right:10px;
+  }
+
+  .taskText{
+    font-size:16.5px;
+    padding-top:15px;
+    padding-bottom:15px;
+  }
+
+  .completedHead{
+    min-height:42px;
+    margin-bottom:12px;
+  }
+
+  .completedRow{
+    min-height:58px;
+    border-radius:17px;
+  }
+
+  .emptyState{
+    min-height:180px;
+    align-content:center;
+  }
+
+  .taskRow:hover{
+    transform:translateY(-1px);
+    border-color:rgba(183,197,217,.95);
+    box-shadow:0 10px 24px rgba(27,43,75,.075);
+  }
+
+  .completedRow:hover{
+    background:rgba(235,239,244,.9);
+  }
+
+  .connectionBtn:hover,
+  .urgentBtn:hover,
+  .addBtn:hover,
+  .deleteCompletedBtn:hover,
+  .completeBtn:hover,
+  .restoreBtn:hover{
+    filter:brightness(.985);
+  }
+
+  .completeBtn:focus-visible,
+  .restoreBtn:focus-visible,
+  .connectionBtn:focus-visible,
+  .urgentBtn:focus-visible,
+  .addBtn:focus-visible,
+  .deleteCompletedBtn:focus-visible,
+  .addRow input:focus-visible{
+    outline:3px solid rgba(52,125,245,.22);
+    outline-offset:2px;
+  }
+
+  .app:has(.completedSection[hidden]) .todoSection{
+    grid-column:1 / -1;
+  }
+}
+
+@media (min-width:1500px){
+  .app{
+    width:min(100%,1280px)!important;
+    max-width:1280px!important;
+    grid-template-columns:minmax(0,1.2fr) minmax(390px,.8fr);
+    column-gap:36px;
+    padding-left:40px!important;
+    padding-right:40px!important;
+  }
+  .completedSection{padding-left:36px}
+}
+
+@media (min-width:1120px) and (prefers-color-scheme:dark){
+  .app{
+    background:rgba(8,17,31,.40);
+    border-color:rgba(83,103,132,.34);
+    box-shadow:0 24px 70px rgba(0,0,0,.20);
+  }
+  .completedSection{
+    border-left-color:rgba(83,103,132,.34);
+  }
+  .completedRow:hover{
+    background:#172235;
+  }
+}
