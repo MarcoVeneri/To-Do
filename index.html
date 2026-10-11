@@ -50,8 +50,6 @@
 
       <div class="filterRow" aria-label="Riepilogo attività">
         <div class="filterChip active">Tutte <b id="allCount">0</b></div>
-        <div class="filterChip">Prioritarie <b id="priorityCount">0</b></div>
-        <div class="filterChip">Completate <b id="completedCount">0</b></div>
       </div>
 
       <section class="todoSection" aria-label="Da fare">
@@ -116,26 +114,18 @@
   <script>
     (()=>{
       const all=document.getElementById('allCount');
-      const priority=document.getElementById('priorityCount');
-      const completed=document.getElementById('completedCount');
       const desktopSync=document.getElementById('desktopSyncText');
       const sync=document.getElementById('syncStatus');
       const activeList=document.getElementById('activeList');
-      const completedList=document.getElementById('completedList');
-      const updateCounts=()=>{
-        const activeRows=[...activeList.querySelectorAll('.taskRow')];
-        const doneRows=completedList.querySelectorAll('.completedRow');
-        all.textContent=activeRows.length;
-        priority.textContent=activeRows.filter(r=>r.classList.contains('urgent')).length;
-        completed.textContent=doneRows.length;
+      const updateCount=()=>{
+        if(all) all.textContent=activeList.querySelectorAll('.taskRow').length;
       };
       const updateSync=()=>{
         if(desktopSync&&sync&&desktopSync.textContent!==sync.textContent) desktopSync.textContent=sync.textContent;
       };
-      new MutationObserver(updateCounts).observe(activeList,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-      new MutationObserver(updateCounts).observe(completedList,{childList:true,subtree:true});
+      new MutationObserver(updateCount).observe(activeList,{childList:true,subtree:true});
       new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});
-      updateCounts();
+      updateCount();
       updateSync();
     })();
   </script>
