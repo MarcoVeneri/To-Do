@@ -11,6 +11,82 @@ body{padding:max(8px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right
 .completedHead h2{font-size:19px}.completedRow{min-height:58px}.completedText{font-size:16px}.deleteCompletedBtn{height:38px;font-size:13px}
 .addRow{left:40px;right:40px;bottom:24px;grid-template-columns:minmax(0,1fr) 52px 56px;padding:9px}.addRow input{height:54px;font-size:17px}.urgentBtn,.addBtn{height:54px}.urgentBtn{width:52px}.addBtn{width:56px;font-size:27px}
 .connectionBtn,.avatar{width:48px;height:48px}.avatar{font-size:17px}
+
+/* Apple-inspired polish: richer color, layered glass, softer depth */
+body{
+  background:
+    radial-gradient(circle at 8% 8%,rgba(255,179,191,.68),transparent 25%),
+    radial-gradient(circle at 88% 12%,rgba(116,152,255,.72),transparent 30%),
+    radial-gradient(circle at 72% 82%,rgba(142,221,255,.54),transparent 28%),
+    linear-gradient(145deg,#e8eefc 0%,#f4edf5 48%,#d9e7fb 100%)!important;
+}
+.shell{
+  border-color:rgba(255,255,255,.68)!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.34),rgba(255,255,255,.16))!important;
+  box-shadow:0 30px 90px rgba(68,82,128,.22),inset 0 1px 0 rgba(255,255,255,.72)!important;
+  backdrop-filter:blur(34px) saturate(175%)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(175%)!important;
+}
+.sidebar{
+  background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(242,245,255,.16))!important;
+}
+.brandIcon{
+  background:linear-gradient(145deg,#5d7cff,#7a5cff 55%,#b45cff)!important;
+  box-shadow:0 10px 24px rgba(93,92,220,.30),inset 0 1px 0 rgba(255,255,255,.45)!important;
+}
+.sideNav.active{
+  background:linear-gradient(135deg,rgba(255,255,255,.70),rgba(236,241,255,.52))!important;
+  box-shadow:0 8px 22px rgba(67,84,130,.09),inset 0 1px 0 rgba(255,255,255,.75)!important;
+}
+.avatar{
+  background:linear-gradient(145deg,#4f8cff,#6d63ff 55%,#a55bf1)!important;
+  box-shadow:0 10px 24px rgba(85,91,210,.28),inset 0 1px 0 rgba(255,255,255,.40)!important;
+}
+.filterChip.active{
+  background:linear-gradient(135deg,#0a84ff,#5e5ce6)!important;
+  box-shadow:0 9px 22px rgba(53,105,230,.28),inset 0 1px 0 rgba(255,255,255,.28)!important;
+}
+.taskRow{
+  background:linear-gradient(145deg,rgba(255,255,255,.60),rgba(247,249,255,.36))!important;
+  border-color:rgba(255,255,255,.72)!important;
+  box-shadow:0 10px 28px rgba(57,75,116,.10),inset 0 1px 0 rgba(255,255,255,.72)!important;
+}
+.taskRow.urgent{
+  background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(255,239,242,.56))!important;
+  box-shadow:0 10px 28px rgba(255,75,105,.10),inset 3px 0 0 rgba(255,69,85,.88),inset 0 1px 0 rgba(255,255,255,.74)!important;
+}
+.completedRow{
+  background:linear-gradient(145deg,rgba(245,247,255,.48),rgba(235,240,250,.30))!important;
+}
+.addRow{
+  background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(245,248,255,.46))!important;
+  border-color:rgba(255,255,255,.76)!important;
+  box-shadow:0 20px 46px rgba(49,69,112,.20),inset 0 1px 0 rgba(255,255,255,.78)!important;
+  backdrop-filter:blur(30px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+}
+.addRow input{background:rgba(255,255,255,.46)!important}
+.addBtn{
+  background:linear-gradient(145deg,#0a84ff,#526dff 58%,#765cff)!important;
+  box-shadow:0 10px 24px rgba(54,103,237,.34),inset 0 1px 0 rgba(255,255,255,.42)!important;
+}
+.urgentBtn{
+  background:linear-gradient(145deg,rgba(255,255,255,.50),rgba(255,240,244,.38))!important;
+}
+.priorityDot{
+  background:linear-gradient(145deg,#ff375f,#ff7a59)!important;
+  box-shadow:0 0 0 5px rgba(255,55,95,.09),0 5px 14px rgba(255,55,95,.20)!important;
+}
+
+@media(prefers-color-scheme:dark){
+  body{background:radial-gradient(circle at 14% 8%,rgba(117,63,105,.28),transparent 26%),radial-gradient(circle at 88% 10%,rgba(54,91,180,.34),transparent 30%),linear-gradient(145deg,#07111f,#11182a 48%,#0a1425)!important}
+  .shell{background:linear-gradient(145deg,rgba(20,31,50,.72),rgba(12,22,38,.54))!important;border-color:rgba(255,255,255,.10)!important}
+  .taskRow{background:linear-gradient(145deg,rgba(28,42,64,.80),rgba(21,32,51,.62))!important;border-color:rgba(255,255,255,.08)!important}
+  .taskRow.urgent{background:linear-gradient(145deg,rgba(40,43,64,.88),rgba(58,30,43,.72))!important}
+  .addRow{background:linear-gradient(145deg,rgba(26,40,63,.90),rgba(17,29,48,.76))!important;border-color:rgba(255,255,255,.10)!important}
+  .addRow input{background:rgba(255,255,255,.06)!important}
+}
+
 @media(max-width:760px){
  body{padding:0}
  .shell{display:block;width:100%;min-height:100dvh;border:0;border-radius:0;box-shadow:none;background:transparent;overflow:visible}
