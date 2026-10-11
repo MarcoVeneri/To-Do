@@ -1,0 +1,51 @@
+/* Compact notes + priority siren on the right */
+.list{gap:6px!important}
+.taskRow{
+  min-height:54px!important;
+  grid-template-columns:minmax(0,1fr) 38px 42px!important;
+  padding:0 7px 0 12px!important;
+  border-radius:16px!important;
+}
+.taskText{
+  padding:10px 8px 10px 0!important;
+  font-size:16px!important;
+  line-height:1.2!important;
+}
+.urgentToggle{
+  order:2!important;
+  width:36px!important;
+  min-height:52px!important;
+  display:grid!important;
+  place-items:center!important;
+  color:#7d8fa1!important;
+}
+.urgentToggle svg{
+  display:block!important;
+  width:21px!important;
+  height:21px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+.taskRow.urgent .urgentToggle{
+  color:#ef4f59!important;
+}
+.taskRow.urgent .urgentToggle svg{
+  filter:drop-shadow(0 0 5px rgba(239,79,89,.22));
+}
+.completeBtn{order:3!important}
+.checkCircle{width:23px!important;height:23px!important}
+.completedSection{margin-top:14px!important;padding-top:12px!important}
+.completedRow{min-height:50px!important;border-radius:15px!important}
+.completedText{font-size:15px!important}
+
+@media(max-width:760px){
+ .list{gap:5px!important}
+ .taskRow{min-height:52px!important;grid-template-columns:minmax(0,1fr) 36px 40px!important;border-radius:15px!important;padding-left:11px!important}
+ .taskText{padding:9px 6px 9px 0!important;font-size:16px!important}
+ .urgentToggle{width:34px!important;min-height:50px!important}
+ .urgentToggle svg{width:20px!important;height:20px!important}
+ .checkCircle{width:22px!important;height:22px!important}
+}
