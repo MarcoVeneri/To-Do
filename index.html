@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="./large-screen.css?v=2">
   <link rel="stylesheet" href="./replica.css?v=3">
   <link rel="stylesheet" href="./theme-soft.css?v=1">
-  <link rel="stylesheet" href="./compact-layout.css?v=2">
+  <link rel="stylesheet" href="./compact-layout.css?v=3">
   <script src="./config.js?v=1.0.0"></script>
 </head>
 <body>
@@ -64,7 +64,9 @@
   <div id="confirmOverlay" class="overlay" hidden><section class="modal confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle"><div class="trashCircle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg></div><h2 id="confirmTitle">Eliminare le completate?</h2><p>Le attività completate verranno eliminate definitivamente.</p><div class="confirmActions"><button id="cancelDeleteBtn" class="secondaryBtn" type="button">Annulla</button><button id="confirmDeleteBtn" class="dangerBtn" type="button">Elimina tutto</button></div></section></div>
   <div id="toast" class="toast" role="status"></div>
 
-  <script src="./app.js?v=1.0.4"></script><script src="./interaction-fix.js?v=1.0.2"></script>
+  <script src="./app.js?v=1.0.4"></script>
+  <script src="./interaction-fix.js?v=1.0.2"></script>
+  <script src="./row-cleanup.js?v=1"></script>
   <script>(()=>{const desktopSync=document.getElementById('desktopSyncText'),sync=document.getElementById('syncStatus');const updateSync=()=>{if(desktopSync&&sync)desktopSync.textContent=sync.textContent};new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});updateSync()})();</script>
 </body>
 </html>
