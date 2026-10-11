@@ -8,49 +8,48 @@
   box-shadow:0 0 0 4px rgba(255,69,58,.07);
   display:block;
 }
+.priorityFlag{
+  display:block;
+  color:#fff;
+  font-size:25px;
+  line-height:1;
+  transform:translateY(-1px);
+  text-shadow:0 0 14px rgba(255,255,255,.28);
+}
+.urgentBtn.active{
+  background:linear-gradient(145deg,#ff4f87,#9a4dff)!important;
+  box-shadow:0 0 26px rgba(255,79,135,.38),inset 0 1px 0 rgba(255,255,255,.26)!important;
+}
+.urgentBtn.active .priorityFlag{color:#fff;text-shadow:0 0 18px rgba(255,150,190,.9)}
+
 @media(max-width:560px){
   .urgentToggle.urgentSiren::after{width:10px;height:10px}
-
-  /* iPhone: evita lo zoom automatico di Safari quando l'input prende il focus */
-  .addRow input{font-size:16px!important}
-
-  /* La barra di inserimento resta SEMPRE fissa in basso */
-  .app{padding-bottom:112px!important}
+  .app{padding-bottom:124px!important}
   .addRow{
     position:fixed!important;
-    z-index:80;
-    left:max(10px,env(safe-area-inset-left));
-    right:max(10px,env(safe-area-inset-right));
-    bottom:max(8px,env(safe-area-inset-bottom));
-    top:auto;
+    z-index:100!important;
+    left:max(7px,env(safe-area-inset-left))!important;
+    right:max(7px,env(safe-area-inset-right))!important;
+    bottom:max(7px,env(safe-area-inset-bottom))!important;
+    top:auto!important;
     width:auto!important;
     max-width:none!important;
-    min-width:0;
+    min-width:0!important;
     margin:0!important;
-    padding:8px;
-    border:1px solid rgba(110,130,160,.22);
-    border-radius:20px;
-    background:rgba(244,246,250,.94);
-    box-shadow:0 14px 42px rgba(0,0,0,.20);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
   }
-  .addRow>*{min-width:0}
+  body.noteEntryActive .addRow{
+    position:fixed!important;
+    left:max(7px,env(safe-area-inset-left))!important;
+    right:max(7px,env(safe-area-inset-right))!important;
+    bottom:max(7px,env(safe-area-inset-bottom))!important;
+    top:auto!important;
+    width:auto!important;
+  }
+  .addRow>*{min-width:0!important}
   .addRow input{
     width:100%!important;
     max-width:100%!important;
-  }
-
-  /* Con tastiera aperta resta subito sopra la tastiera */
-  body.noteEntryActive .addRow{
-    top:var(--todo-composer-top,auto);
-    bottom:auto;
-  }
-}
-
-@media(max-width:560px) and (prefers-color-scheme:dark){
-  .addRow{
-    background:rgba(8,17,31,.94);
-    border-color:rgba(130,150,180,.24);
+    min-width:0!important;
+    font-size:16px!important;
   }
 }
