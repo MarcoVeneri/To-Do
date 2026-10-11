@@ -3,67 +3,85 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme:light)">
-  <meta name="theme-color" content="#08111f" media="(prefers-color-scheme:dark)">
+  <meta name="theme-color" content="#dfe9fb" media="(prefers-color-scheme:light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme:dark)">
   <meta name="color-scheme" content="light dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="To Do">
-  <title>To Do</title>
+  <title>Le mie attività</title>
   <link rel="manifest" href="./manifest.webmanifest?v=2">
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=2">
   <link rel="icon" sizes="192x192" href="./icon-192.png?v=2" type="image/png">
-  <link rel="stylesheet" href="./styles.css?v=1.0.1">
-  <link rel="stylesheet" href="./theme.css?v=1.0.1">
-  <link rel="stylesheet" href="./urgent.css?v=1.0.4">
+  <link rel="stylesheet" href="./styles.css?v=2.0.0">
   <link rel="stylesheet" href="./interaction-fix.css?v=1.0.2">
-  <link rel="stylesheet" href="./desktop.css?v=1.0.0">
   <script src="./config.js?v=1.0.0"></script>
 </head>
 <body>
-  <main class="app" aria-live="polite">
-    <header class="header">
-      <div>
-        <h1>To Do</h1>
-        <div id="syncStatus" class="syncStatus">Sincronizzazione…</div>
+  <div class="ambient ambientOne"></div>
+  <div class="ambient ambientTwo"></div>
+
+  <div class="shell">
+    <aside class="sidebar" aria-label="Navigazione">
+      <div class="brand">
+        <div class="brandIcon">Q</div>
+        <strong>QuickList</strong>
       </div>
-      <button id="connectionBtn" class="connectionBtn" type="button" aria-label="Impostazioni sincronizzazione" title="Sincronizzazione">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M21 4v5h-5"/><path d="M21 9a9 9 0 0 0-3.2-4.2"/></svg>
-      </button>
-    </header>
+      <div class="sideNav active"><span>▣</span> Le mie attività</div>
+      <div class="sideNav"><span>✓</span> Completate</div>
+      <div class="sideDivider"></div>
+      <div class="sideNav"><span>⚙</span> Impostazioni</div>
+      <div class="sideSync"><span class="syncDot"></span><span id="desktopSyncText">Sincronizzato</span></div>
+      <div class="sideQuote">“Piccole cose,<br>grandi risultati.”</div>
+    </aside>
 
-    <form id="addForm" class="addRow" autocomplete="off">
-      <input id="noteInput" maxlength="500" type="text" inputmode="text" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota">
-      <button id="urgentBtn" class="urgentBtn" type="button" aria-pressed="false" aria-label="Segna la nuova nota come urgente" title="Urgente">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 15V9a4 4 0 0 1 8 0v6"/>
-          <path d="M6 15h12l1.5 3H4.5L6 15Z"/>
-          <path d="M12 2V1M4.9 4.9 4.2 4.2M19.1 4.9l.7-.7M2 10H1M23 10h-1"/>
-        </svg>
-      </button>
-      <button id="addBtn" class="addBtn" type="submit" aria-label="Aggiungi nota">+</button>
-    </form>
-
-    <section class="todoSection" aria-label="Da fare">
-      <div id="activeList" class="list"></div>
-      <div id="emptyActive" class="emptyState" hidden>
-        <div class="emptyIcon">✓</div>
-        <strong>Tutto fatto</strong>
-        <span>Aggiungi una nuova cosa da ricordare.</span>
-      </div>
-    </section>
-
-    <section id="completedSection" class="completedSection" aria-label="Completate">
-      <div class="completedHead">
-        <h2>Completate</h2>
-        <button id="deleteCompletedBtn" class="deleteCompletedBtn" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>
-          <span>Elimina completate</span>
+    <main class="app" aria-live="polite">
+      <header class="header">
+        <div>
+          <h1>Le mie attività</h1>
+          <p class="subtitle">Semplice. Sempre con te.</p>
+          <div id="syncStatus" class="syncStatus">Sincronizzazione…</div>
+        </div>
+        <button id="connectionBtn" class="connectionBtn" type="button" aria-label="Impostazioni sincronizzazione" title="Sincronizzazione">
+          <span class="avatar">M</span>
         </button>
+      </header>
+
+      <div class="filterRow" aria-label="Riepilogo attività">
+        <div class="filterChip active">Tutte <b id="allCount">0</b></div>
+        <div class="filterChip">Prioritarie <b id="priorityCount">0</b></div>
+        <div class="filterChip">Completate <b id="completedCount">0</b></div>
       </div>
-      <div id="completedList" class="list completedList"></div>
-    </section>
-  </main>
+
+      <section class="todoSection" aria-label="Da fare">
+        <div id="activeList" class="list"></div>
+        <div id="emptyActive" class="emptyState" hidden>
+          <div class="emptyIcon">✓</div>
+          <strong>Tutto fatto</strong>
+          <span>Aggiungi una nuova cosa da ricordare.</span>
+        </div>
+      </section>
+
+      <section id="completedSection" class="completedSection" aria-label="Completate">
+        <div class="completedHead">
+          <h2>Completate</h2>
+          <button id="deleteCompletedBtn" class="deleteCompletedBtn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>
+            <span>Svuota completate</span>
+          </button>
+        </div>
+        <div id="completedList" class="list completedList"></div>
+      </section>
+
+      <form id="addForm" class="addRow" autocomplete="off">
+        <input id="noteInput" maxlength="500" type="text" inputmode="text" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota">
+        <button id="urgentBtn" class="urgentBtn" type="button" aria-pressed="false" aria-label="Segna la nuova nota come urgente" title="Prioritaria">
+          <span class="priorityDot"></span>
+        </button>
+        <button id="addBtn" class="addBtn" type="submit" aria-label="Aggiungi nota">↑</button>
+      </form>
+    </main>
+  </div>
 
   <div id="setupOverlay" class="overlay" hidden>
     <section class="modal setupModal" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
@@ -94,5 +112,24 @@
 
   <script src="./app.js?v=1.0.4"></script>
   <script src="./interaction-fix.js?v=1.0.1"></script>
+  <script>
+    (()=>{
+      const all=document.getElementById('allCount');
+      const priority=document.getElementById('priorityCount');
+      const completed=document.getElementById('completedCount');
+      const desktopSync=document.getElementById('desktopSyncText');
+      const sync=document.getElementById('syncStatus');
+      const update=()=>{
+        const activeRows=[...document.querySelectorAll('#activeList .taskRow')];
+        const doneRows=document.querySelectorAll('#completedList .completedRow');
+        all.textContent=activeRows.length;
+        priority.textContent=activeRows.filter(r=>r.classList.contains('urgent')).length;
+        completed.textContent=doneRows.length;
+        if(desktopSync&&sync) desktopSync.textContent=sync.textContent;
+      };
+      new MutationObserver(update).observe(document.querySelector('.app'),{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','hidden']});
+      update();
+    })();
+  </script>
 </body>
 </html>
