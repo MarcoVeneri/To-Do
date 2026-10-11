@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#090b2b">
+  <meta name="theme-color" content="#0e1622">
   <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./styles.css?v=2.0.0">
   <link rel="stylesheet" href="./interaction-fix.css?v=1.0.4">
   <link rel="stylesheet" href="./large-screen.css?v=2">
-  <link rel="stylesheet" href="./replica.css?v=2">
+  <link rel="stylesheet" href="./replica.css?v=3">
   <script src="./config.js?v=1.0.0"></script>
 </head>
 <body>
@@ -36,12 +36,6 @@
         <div><h1>To-do</h1><p class="subtitle">Organizza la tua giornata</p><div id="syncStatus" class="syncStatus">Sincronizzazione…</div></div>
         <button id="connectionBtn" class="connectionBtn" type="button" aria-label="Impostazioni sincronizzazione" title="Sincronizzazione"><span class="avatar">•••</span></button>
       </header>
-
-      <section class="statsRow singleStat" aria-label="Riepilogo attività">
-        <div class="statCard statTotal"><div class="statIcon ring"></div><div><strong id="totalCount">0</strong><span>Totali</span></div></div>
-      </section>
-
-      <div class="filterRow" aria-label="Filtri attività"><div class="filterChip active">Tutte <b id="allCount">0</b></div></div>
 
       <section class="todoSection" aria-label="Da fare">
         <div id="activeList" class="list"></div>
@@ -66,6 +60,6 @@
   <div id="toast" class="toast" role="status"></div>
 
   <script src="./app.js?v=1.0.4"></script><script src="./interaction-fix.js?v=1.0.2"></script>
-  <script>(()=>{const all=document.getElementById('allCount'),total=document.getElementById('totalCount'),desktopSync=document.getElementById('desktopSyncText'),sync=document.getElementById('syncStatus'),activeList=document.getElementById('activeList'),completedList=document.getElementById('completedList');const updateCounts=()=>{const a=activeList.querySelectorAll('.taskRow').length,d=completedList.querySelectorAll('.completedRow').length;if(all)all.textContent=a+d;if(total)total.textContent=a+d};const updateSync=()=>{if(desktopSync&&sync)desktopSync.textContent=sync.textContent};new MutationObserver(updateCounts).observe(activeList,{childList:true,subtree:true});new MutationObserver(updateCounts).observe(completedList,{childList:true,subtree:true});new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});updateCounts();updateSync()})();</script>
+  <script>(()=>{const desktopSync=document.getElementById('desktopSyncText'),sync=document.getElementById('syncStatus');const updateSync=()=>{if(desktopSync&&sync)desktopSync.textContent=sync.textContent};new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});updateSync()})();</script>
 </body>
 </html>
