@@ -119,16 +119,23 @@
       const completed=document.getElementById('completedCount');
       const desktopSync=document.getElementById('desktopSyncText');
       const sync=document.getElementById('syncStatus');
-      const update=()=>{
-        const activeRows=[...document.querySelectorAll('#activeList .taskRow')];
-        const doneRows=document.querySelectorAll('#completedList .completedRow');
+      const activeList=document.getElementById('activeList');
+      const completedList=document.getElementById('completedList');
+      const updateCounts=()=>{
+        const activeRows=[...activeList.querySelectorAll('.taskRow')];
+        const doneRows=completedList.querySelectorAll('.completedRow');
         all.textContent=activeRows.length;
         priority.textContent=activeRows.filter(r=>r.classList.contains('urgent')).length;
         completed.textContent=doneRows.length;
-        if(desktopSync&&sync) desktopSync.textContent=sync.textContent;
       };
-      new MutationObserver(update).observe(document.querySelector('.app'),{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','hidden']});
-      update();
+      const updateSync=()=>{
+        if(desktopSync&&sync&&desktopSync.textContent!==sync.textContent) desktopSync.textContent=sync.textContent;
+      };
+      new MutationObserver(updateCounts).observe(activeList,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+      new MutationObserver(updateCounts).observe(completedList,{childList:true,subtree:true});
+      new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});
+      updateCounts();
+      updateSync();
     })();
   </script>
 </body>
