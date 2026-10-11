@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#dfe9fb" media="(prefers-color-scheme:light)">
-  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme:dark)">
-  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#120a2a">
+  <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="To Do">
@@ -16,18 +15,14 @@
   <link rel="stylesheet" href="./styles.css?v=2.0.0">
   <link rel="stylesheet" href="./interaction-fix.css?v=1.0.2">
   <link rel="stylesheet" href="./large-screen.css?v=2">
+  <link rel="stylesheet" href="./future-ui.css?v=1">
   <script src="./config.js?v=1.0.0"></script>
 </head>
 <body>
-  <div class="ambient ambientOne"></div>
-  <div class="ambient ambientTwo"></div>
-
+  <div class="ambient ambientOne"></div><div class="ambient ambientTwo"></div>
   <div class="shell">
     <aside class="sidebar" aria-label="Navigazione">
-      <div class="brand">
-        <div class="brandIcon">Q</div>
-        <strong>QuickList</strong>
-      </div>
+      <div class="brand"><div class="brandIcon">Q</div><strong>QuickList</strong></div>
       <div class="sideNav active"><span>▣</span> Le mie attività</div>
       <div class="sideNav"><span>✓</span> Completate</div>
       <div class="sideDivider"></div>
@@ -35,99 +30,18 @@
       <div class="sideSync"><span class="syncDot"></span><span id="desktopSyncText">Sincronizzato</span></div>
       <div class="sideQuote">“Piccole cose,<br>grandi risultati.”</div>
     </aside>
-
     <main class="app" aria-live="polite">
-      <header class="header">
-        <div>
-          <h1>To-do</h1>
-          <p class="subtitle">Semplice. Sempre con te.</p>
-          <div id="syncStatus" class="syncStatus">Sincronizzazione…</div>
-        </div>
-        <button id="connectionBtn" class="connectionBtn" type="button" aria-label="Impostazioni sincronizzazione" title="Sincronizzazione">
-          <span class="avatar">M</span>
-        </button>
-      </header>
-
-      <div class="filterRow" aria-label="Riepilogo attività">
-        <div class="filterChip active">Tutte <b id="allCount">0</b></div>
-      </div>
-
-      <section class="todoSection" aria-label="Da fare">
-        <div id="activeList" class="list"></div>
-        <div id="emptyActive" class="emptyState" hidden>
-          <div class="emptyIcon">✓</div>
-          <strong>Tutto fatto</strong>
-          <span>Aggiungi una nuova cosa da ricordare.</span>
-        </div>
-      </section>
-
-      <section id="completedSection" class="completedSection" aria-label="Completate">
-        <div class="completedHead">
-          <h2>Completate</h2>
-          <button id="deleteCompletedBtn" class="deleteCompletedBtn" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>
-            <span>Svuota completate</span>
-          </button>
-        </div>
-        <div id="completedList" class="list completedList"></div>
-      </section>
-
-      <form id="addForm" class="addRow" autocomplete="off">
-        <input id="noteInput" maxlength="500" type="text" inputmode="text" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota">
-        <button id="urgentBtn" class="urgentBtn" type="button" aria-pressed="false" aria-label="Segna la nuova nota come urgente" title="Prioritaria">
-          <span class="priorityDot"></span>
-        </button>
-        <button id="addBtn" class="addBtn" type="submit" aria-label="Aggiungi nota">↑</button>
-      </form>
+      <header class="header"><div><h1>To-do</h1><p class="subtitle">Semplice. Sempre con te.</p><div id="syncStatus" class="syncStatus">Sincronizzazione…</div></div><button id="connectionBtn" class="connectionBtn" type="button" aria-label="Impostazioni sincronizzazione" title="Sincronizzazione"><span class="avatar">M</span></button></header>
+      <div class="filterRow" aria-label="Riepilogo attività"><div class="filterChip active">Tutte <b id="allCount">0</b></div></div>
+      <section class="todoSection" aria-label="Da fare"><div id="activeList" class="list"></div><div id="emptyActive" class="emptyState" hidden><div class="emptyIcon">✓</div><strong>Tutto fatto</strong><span>Aggiungi una nuova cosa da ricordare.</span></div></section>
+      <section id="completedSection" class="completedSection" aria-label="Completate"><div class="completedHead"><h2>Completate</h2><button id="deleteCompletedBtn" class="deleteCompletedBtn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg><span>Svuota completate</span></button></div><div id="completedList" class="list completedList"></div></section>
+      <form id="addForm" class="addRow" autocomplete="off"><input id="noteInput" maxlength="500" type="text" inputmode="text" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota"><button id="urgentBtn" class="urgentBtn" type="button" aria-pressed="false" aria-label="Segna la nuova nota come urgente" title="Prioritaria"><span class="priorityDot"></span></button><button id="addBtn" class="addBtn" type="submit" aria-label="Aggiungi nota">↑</button></form>
     </main>
   </div>
-
-  <div id="setupOverlay" class="overlay" hidden>
-    <section class="modal setupModal" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
-      <div class="modalIcon">✓</div>
-      <h2 id="setupTitle">Attiva la sincronizzazione</h2>
-      <p>Inserisci il codice privato una sola volta su questo dispositivo.</p>
-      <input id="tokenInput" class="tokenInput" type="password" autocomplete="off" placeholder="Codice privato">
-      <div id="setupMessage" class="setupMessage"></div>
-      <button id="saveTokenBtn" class="primaryBtn" type="button">Salva e sincronizza</button>
-    </section>
-  </div>
-
-  <div id="confirmOverlay" class="overlay" hidden>
-    <section class="modal confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
-      <div class="trashCircle">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>
-      </div>
-      <h2 id="confirmTitle">Eliminare le completate?</h2>
-      <p>Le attività completate verranno eliminate definitivamente.</p>
-      <div class="confirmActions">
-        <button id="cancelDeleteBtn" class="secondaryBtn" type="button">Annulla</button>
-        <button id="confirmDeleteBtn" class="dangerBtn" type="button">Elimina tutto</button>
-      </div>
-    </section>
-  </div>
-
+  <div id="setupOverlay" class="overlay" hidden><section class="modal setupModal" role="dialog" aria-modal="true" aria-labelledby="setupTitle"><div class="modalIcon">✓</div><h2 id="setupTitle">Attiva la sincronizzazione</h2><p>Inserisci il codice privato una sola volta su questo dispositivo.</p><input id="tokenInput" class="tokenInput" type="password" autocomplete="off" placeholder="Codice privato"><div id="setupMessage" class="setupMessage"></div><button id="saveTokenBtn" class="primaryBtn" type="button">Salva e sincronizza</button></section></div>
+  <div id="confirmOverlay" class="overlay" hidden><section class="modal confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle"><div class="trashCircle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg></div><h2 id="confirmTitle">Eliminare le completate?</h2><p>Le attività completate verranno eliminate definitivamente.</p><div class="confirmActions"><button id="cancelDeleteBtn" class="secondaryBtn" type="button">Annulla</button><button id="confirmDeleteBtn" class="dangerBtn" type="button">Elimina tutto</button></div></section></div>
   <div id="toast" class="toast" role="status"></div>
-
-  <script src="./app.js?v=1.0.4"></script>
-  <script src="./interaction-fix.js?v=1.0.1"></script>
-  <script>
-    (()=>{
-      const all=document.getElementById('allCount');
-      const desktopSync=document.getElementById('desktopSyncText');
-      const sync=document.getElementById('syncStatus');
-      const activeList=document.getElementById('activeList');
-      const updateCount=()=>{
-        if(all) all.textContent=activeList.querySelectorAll('.taskRow').length;
-      };
-      const updateSync=()=>{
-        if(desktopSync&&sync&&desktopSync.textContent!==sync.textContent) desktopSync.textContent=sync.textContent;
-      };
-      new MutationObserver(updateCount).observe(activeList,{childList:true,subtree:true});
-      new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});
-      updateCount();
-      updateSync();
-    })();
-  </script>
+  <script src="./app.js?v=1.0.4"></script><script src="./interaction-fix.js?v=1.0.1"></script>
+  <script>(()=>{const all=document.getElementById('allCount'),desktopSync=document.getElementById('desktopSyncText'),sync=document.getElementById('syncStatus'),activeList=document.getElementById('activeList');const updateCount=()=>{if(all)all.textContent=activeList.querySelectorAll('.taskRow').length};const updateSync=()=>{if(desktopSync&&sync&&desktopSync.textContent!==sync.textContent)desktopSync.textContent=sync.textContent};new MutationObserver(updateCount).observe(activeList,{childList:true,subtree:true});new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});updateCount();updateSync()})();</script>
 </body>
 </html>
