@@ -13,9 +13,9 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=2">
   <link rel="icon" sizes="192x192" href="./icon-192.png?v=2" type="image/png">
   <link rel="stylesheet" href="./styles.css?v=2.0.0">
-  <link rel="stylesheet" href="./interaction-fix.css?v=1.0.2">
+  <link rel="stylesheet" href="./interaction-fix.css?v=1.0.3">
   <link rel="stylesheet" href="./large-screen.css?v=2">
-  <link rel="stylesheet" href="./replica.css?v=1">
+  <link rel="stylesheet" href="./replica.css?v=2">
   <script src="./config.js?v=1.0.0"></script>
 </head>
 <body>
@@ -37,10 +37,8 @@
         <button id="connectionBtn" class="connectionBtn" type="button" aria-label="Impostazioni sincronizzazione" title="Sincronizzazione"><span class="avatar">•••</span></button>
       </header>
 
-      <section class="statsRow" aria-label="Riepilogo attività">
+      <section class="statsRow singleStat" aria-label="Riepilogo attività">
         <div class="statCard statTotal"><div class="statIcon ring"></div><div><strong id="totalCount">0</strong><span>Totali</span></div></div>
-        <div class="statCard statOpen"><div class="statIcon dot"></div><div><strong id="todoCount">0</strong><span>Da fare</span></div></div>
-        <div class="statCard statDone"><div class="statIcon check">✓</div><div><strong id="doneCount">0</strong><span>Completate</span></div></div>
       </section>
 
       <div class="filterRow" aria-label="Filtri attività"><div class="filterChip active">Tutte <b id="allCount">0</b></div></div>
@@ -56,9 +54,9 @@
       </section>
 
       <form id="addForm" class="addRow" autocomplete="off">
-        <button id="urgentBtn" class="urgentBtn" type="button" aria-pressed="false" aria-label="Segna la nuova nota come urgente" title="Prioritaria"><span class="priorityDot">＋</span></button>
-        <input id="noteInput" maxlength="500" type="text" inputmode="text" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota">
-        <button id="addBtn" class="addBtn" type="submit" aria-label="Aggiungi nota">→</button>
+        <button id="urgentBtn" class="urgentBtn" type="button" aria-pressed="false" aria-label="Segna la nuova nota come prioritaria" title="Priorità"><span class="priorityFlag">⚑</span></button>
+        <input id="noteInput" maxlength="500" type="text" inputmode="text" enterkeyhint="done" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota">
+        <button id="addBtn" class="addBtn" type="submit" aria-label="Salva nota">→</button>
       </form>
     </main>
   </div>
@@ -68,6 +66,6 @@
   <div id="toast" class="toast" role="status"></div>
 
   <script src="./app.js?v=1.0.4"></script><script src="./interaction-fix.js?v=1.0.1"></script>
-  <script>(()=>{const all=document.getElementById('allCount'),total=document.getElementById('totalCount'),todo=document.getElementById('todoCount'),done=document.getElementById('doneCount'),desktopSync=document.getElementById('desktopSyncText'),sync=document.getElementById('syncStatus'),activeList=document.getElementById('activeList'),completedList=document.getElementById('completedList');const updateCounts=()=>{const a=activeList.querySelectorAll('.taskRow').length,d=completedList.querySelectorAll('.completedRow').length;if(all)all.textContent=a+d;if(total)total.textContent=a+d;if(todo)todo.textContent=a;if(done)done.textContent=d};const updateSync=()=>{if(desktopSync&&sync)desktopSync.textContent=sync.textContent};new MutationObserver(updateCounts).observe(activeList,{childList:true,subtree:true});new MutationObserver(updateCounts).observe(completedList,{childList:true,subtree:true});new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});updateCounts();updateSync()})();</script>
+  <script>(()=>{const all=document.getElementById('allCount'),total=document.getElementById('totalCount'),desktopSync=document.getElementById('desktopSyncText'),sync=document.getElementById('syncStatus'),activeList=document.getElementById('activeList'),completedList=document.getElementById('completedList');const updateCounts=()=>{const a=activeList.querySelectorAll('.taskRow').length,d=completedList.querySelectorAll('.completedRow').length;if(all)all.textContent=a+d;if(total)total.textContent=a+d};const updateSync=()=>{if(desktopSync&&sync)desktopSync.textContent=sync.textContent};new MutationObserver(updateCounts).observe(activeList,{childList:true,subtree:true});new MutationObserver(updateCounts).observe(completedList,{childList:true,subtree:true});new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});updateCounts();updateSync()})();</script>
 </body>
 </html>
