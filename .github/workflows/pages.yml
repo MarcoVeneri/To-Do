@@ -47,11 +47,7 @@ jobs:
           for y in range(S):
               for x in range(S):
                   t = max(0, min(1, (0.58*x + 0.42*y)/(S-1)))
-                  px[x,y] = (
-                      int(175*(1-t)+70*t),
-                      int(222*(1-t)+153*t),
-                      int(255*(1-t)+244*t)
-                  )
+                  px[x,y] = (int(175*(1-t)+70*t), int(222*(1-t)+153*t), int(255*(1-t)+244*t))
 
           d = ImageDraw.Draw(img)
           blue = (29,126,243)
@@ -62,18 +58,12 @@ jobs:
           d.rounded_rectangle((626,456,775,516), radius=30, fill=blue)
           d.rounded_rectangle((280,655,770,719), radius=32, fill=blue)
 
-          sizes = [120,152,167,180,192,512]
-          for size in sizes:
+          for size in [120,152,167,180,192,512]:
               name = f'icon-{size}.png' if size in (192,512) else f'apple-touch-icon-{size}.png'
               img.resize((size,size), Image.Resampling.LANCZOS).save(outdir/name, 'PNG', optimize=True)
 
-          # fallback standard Apple: puntiamo volutamente alla 120x120, che Safari iPhone 26/27 seleziona spesso.
           shutil.copyfile(outdir/'apple-touch-icon-120.png', outdir/'apple-touch-icon.png')
-          shutil.copyfile(outdir/'apple-touch-icon-120.png', outdir/'apple-touch-icon-precomposed.png')
-
-          # fallback a livello radice del sito, richiesto dalla documentazione Apple per il Web Clip.
           shutil.copyfile(outdir/'apple-touch-icon-120.png', Path('apple-touch-icon.png'))
-          shutil.copyfile(outdir/'apple-touch-icon-120.png', Path('apple-touch-icon-precomposed.png'))
 
           for size in [120,152,167,180,192,512]:
               path = outdir/(f'icon-{size}.png' if size in (192,512) else f'apple-touch-icon-{size}.png')
@@ -86,41 +76,42 @@ jobs:
           source = re.sub(r'\s*<link rel="manifest"[^>]*>', '', source)
           source = re.sub(r'\s*<link rel="(?:shortcut )?icon"[^>]*>', '', source)
           source = re.sub(r'\s*<link rel="apple-touch-icon(?:-precomposed)?"[^>]*>', '', source)
-          links = '''<title>Note</title>
-  <link rel="manifest" href="/To-Do/app-v14/manifest.webmanifest">
-  <link rel="apple-touch-icon" href="/To-Do/app-v14/apple-touch-icon-120.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="/To-Do/app-v14/apple-touch-icon-120.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/To-Do/app-v14/apple-touch-icon-152.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="/To-Do/app-v14/apple-touch-icon-167.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/To-Do/app-v14/apple-touch-icon-180.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v14/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v14/icon-512.png">'''
+          links = (
+              '<title>Note</title>\n'
+              '  <link rel="manifest" href="/To-Do/app-v14/manifest.webmanifest">\n'
+              '  <link rel="apple-touch-icon" href="/To-Do/app-v14/apple-touch-icon-120.png">\n'
+              '  <link rel="apple-touch-icon" sizes="120x120" href="/To-Do/app-v14/apple-touch-icon-120.png">\n'
+              '  <link rel="apple-touch-icon" sizes="152x152" href="/To-Do/app-v14/apple-touch-icon-152.png">\n'
+              '  <link rel="apple-touch-icon" sizes="167x167" href="/To-Do/app-v14/apple-touch-icon-167.png">\n'
+              '  <link rel="apple-touch-icon" sizes="180x180" href="/To-Do/app-v14/apple-touch-icon-180.png">\n'
+              '  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v14/icon-192.png">\n'
+              '  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v14/icon-512.png">'
+          )
           source = source.replace('<title>Note</title>', links, 1)
           if 'name="mobile-web-app-capable"' not in source:
-              source = source.replace(
-                  '<meta name="apple-mobile-web-app-capable" content="yes">',
-                  '<meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="mobile-web-app-capable" content="yes">', 1)
+              source = source.replace('<meta name="apple-mobile-web-app-capable" content="yes">', '<meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="mobile-web-app-capable" content="yes">', 1)
           (outdir/'index.html').write_text(source, encoding='utf-8')
 
-          manifest = '''{
-            "id": "/To-Do/app-v14/",
-            "name": "Note",
-            "short_name": "Note",
-            "start_url": "/To-Do/app-v14/",
-            "scope": "/To-Do/app-v14/",
-            "display": "standalone",
-            "background_color": "#9fd8ff",
-            "theme_color": "#5cb1fa",
-            "icons": [
-              {"src":"./apple-touch-icon-120.png","sizes":"120x120","type":"image/png","purpose":"any"},
-              {"src":"./apple-touch-icon-152.png","sizes":"152x152","type":"image/png","purpose":"any"},
-              {"src":"./apple-touch-icon-167.png","sizes":"167x167","type":"image/png","purpose":"any"},
-              {"src":"./apple-touch-icon-180.png","sizes":"180x180","type":"image/png","purpose":"any"},
-              {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-              {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}
-            ]
-          }
-          '''
+          manifest = (
+              '{\n'
+              '  "id": "/To-Do/app-v14/",\n'
+              '  "name": "Note",\n'
+              '  "short_name": "Note",\n'
+              '  "start_url": "/To-Do/app-v14/",\n'
+              '  "scope": "/To-Do/app-v14/",\n'
+              '  "display": "standalone",\n'
+              '  "background_color": "#9fd8ff",\n'
+              '  "theme_color": "#5cb1fa",\n'
+              '  "icons": [\n'
+              '    {"src":"./apple-touch-icon-120.png","sizes":"120x120","type":"image/png","purpose":"any"},\n'
+              '    {"src":"./apple-touch-icon-152.png","sizes":"152x152","type":"image/png","purpose":"any"},\n'
+              '    {"src":"./apple-touch-icon-167.png","sizes":"167x167","type":"image/png","purpose":"any"},\n'
+              '    {"src":"./apple-touch-icon-180.png","sizes":"180x180","type":"image/png","purpose":"any"},\n'
+              '    {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},\n'
+              '    {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}\n'
+              '  ]\n'
+              '}\n'
+          )
           (outdir/'manifest.webmanifest').write_text(manifest, encoding='utf-8')
           print('APP V14 READY')
           PY
@@ -129,7 +120,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app-v14 apple-touch-icon.png apple-touch-icon-precomposed.png
+          git add app-v14 apple-touch-icon.png
           if ! git diff --cached --quiet; then
             git commit -m "Persist exact iPhone icons v14 [skip ci]"
             git push origin HEAD:main
