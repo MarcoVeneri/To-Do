@@ -23,6 +23,32 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Forza icona iPhone
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          s = re.sub(r'<link rel="manifest"[^>]*>', '<link rel="manifest" href="/To-Do/manifest.webmanifest?v=10">', s, count=1)
+          s = re.sub(r'<link rel="icon" sizes="180x180"[^>]*>', '<link rel="icon" href="/To-Do/note-home-icon.png?v=10" type="image/png">', s, count=1)
+          s = re.sub(r'<link rel="apple-touch-icon"[^>]*>', '<link rel="apple-touch-icon" href="/To-Do/note-home-icon.png?v=10">', s, count=1)
+          p.write_text(s, encoding='utf-8')
+          Path('manifest.webmanifest').write_text('''{
+            "id": "/To-Do/?note=10",
+            "name": "Note",
+            "short_name": "Note",
+            "start_url": "/To-Do/?note=10",
+            "scope": "/To-Do/",
+            "display": "standalone",
+            "background_color": "#edf4fb",
+            "theme_color": "#edf4fb",
+            "icons": [
+              {"src":"/To-Do/note-home-icon.png?v=10","sizes":"180x180","type":"image/png","purpose":"any"}
+            ]
+          }
+          ''', encoding='utf-8')
+          PY
       - name: Carica sito
         uses: actions/upload-pages-artifact@v3
         with:
