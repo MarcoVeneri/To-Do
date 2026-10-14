@@ -13,9 +13,8 @@ self.addEventListener("activate",event=>{
 
 self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
-  const u=new URL(event.request.url);
-  const isMeta=u.pathname.endsWith("manifest.webmanifest")||/icon-(180|192|512)\.png$/.test(u.pathname)||u.pathname.endsWith("apple-touch-icon.png");
-  if(isMeta){
+  const url=new URL(event.request.url);
+  if(url.pathname.endsWith("manifest.webmanifest") || /hub-todo-(180|192|512)-v8\.png$/.test(url.pathname)){
     event.respondWith(fetch(event.request,{cache:"no-store"}));
     return;
   }
