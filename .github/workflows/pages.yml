@@ -8,7 +8,6 @@ permissions:
   contents: write
   pages: write
   id-token: write
-  actions: read
 
 concurrency:
   group: "pages-custom"
@@ -32,14 +31,14 @@ jobs:
       - name: Installa Pillow
         run: python3 -m pip install --disable-pip-version-check pillow
 
-      - name: Crea app iPhone v13 persistente
+      - name: Crea app iPhone v14 con tutte le misure Apple
         run: |
           python3 - <<'PY'
           from pathlib import Path
           from PIL import Image, ImageDraw
-          import re
+          import re, shutil
 
-          outdir = Path('app-v13')
+          outdir = Path('app-v14')
           outdir.mkdir(exist_ok=True)
 
           S = 1024
@@ -47,126 +46,100 @@ jobs:
           px = img.load()
           for y in range(S):
               for x in range(S):
-                  t = (0.58*x + 0.42*y) / (S-1)
-                  t = max(0, min(1, t))
-                  px[x, y] = (
-                      int(175*(1-t) + 70*t),
-                      int(222*(1-t) + 153*t),
-                      int(255*(1-t) + 244*t)
+                  t = max(0, min(1, (0.58*x + 0.42*y)/(S-1)))
+                  px[x,y] = (
+                      int(175*(1-t)+70*t),
+                      int(222*(1-t)+153*t),
+                      int(255*(1-t)+244*t)
                   )
 
           d = ImageDraw.Draw(img)
-          blue = (29, 126, 243)
-          d.rounded_rectangle((118, 82, 906, 942), radius=170, fill=blue)
-          d.rounded_rectangle((174, 138, 850, 886), radius=120, fill=(255, 255, 255))
-          d.line((285, 445, 390, 550), fill=blue, width=66)
-          d.line((390, 550, 585, 326), fill=blue, width=66)
-          d.rounded_rectangle((626, 456, 775, 516), radius=30, fill=blue)
-          d.rounded_rectangle((280, 655, 770, 719), radius=32, fill=blue)
+          blue = (29,126,243)
+          d.rounded_rectangle((118,82,906,942), radius=170, fill=blue)
+          d.rounded_rectangle((174,138,850,886), radius=120, fill=(255,255,255))
+          d.line((285,445,390,550), fill=blue, width=66)
+          d.line((390,550,585,326), fill=blue, width=66)
+          d.rounded_rectangle((626,456,775,516), radius=30, fill=blue)
+          d.rounded_rectangle((280,655,770,719), radius=32, fill=blue)
 
-          files = [
-              (180, outdir/'apple-touch-icon.png'),
-              (180, outdir/'apple-touch-icon-precomposed.png'),
-              (192, outdir/'icon-192.png'),
-              (512, outdir/'icon-512.png'),
-          ]
-          for size, path in files:
-              img.resize((size,size), Image.Resampling.LANCZOS).save(path, 'PNG', optimize=True)
+          sizes = [120,152,167,180,192,512]
+          for size in sizes:
+              name = f'icon-{size}.png' if size in (192,512) else f'apple-touch-icon-{size}.png'
+              img.resize((size,size), Image.Resampling.LANCZOS).save(outdir/name, 'PNG', optimize=True)
 
-          img.resize((256,256), Image.Resampling.LANCZOS).save(
-              outdir/'favicon.ico', format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)]
-          )
+          # fallback standard Apple: puntiamo volutamente alla 120x120, che Safari iPhone 26/27 seleziona spesso.
+          shutil.copyfile(outdir/'apple-touch-icon-120.png', outdir/'apple-touch-icon.png')
+          shutil.copyfile(outdir/'apple-touch-icon-120.png', outdir/'apple-touch-icon-precomposed.png')
 
-          for size, path in files:
-              chk = Image.open(path)
-              chk.load()
-              assert chk.format == 'PNG'
-              assert chk.mode == 'RGB'
-              assert chk.size == (size, size)
-              print('ICON OK', path, chk.size, chk.mode)
+          # fallback a livello radice del sito, richiesto dalla documentazione Apple per il Web Clip.
+          shutil.copyfile(outdir/'apple-touch-icon-120.png', Path('apple-touch-icon.png'))
+          shutil.copyfile(outdir/'apple-touch-icon-120.png', Path('apple-touch-icon-precomposed.png'))
+
+          for size in [120,152,167,180,192,512]:
+              path = outdir/(f'icon-{size}.png' if size in (192,512) else f'apple-touch-icon-{size}.png')
+              chk = Image.open(path); chk.load()
+              assert chk.format == 'PNG' and chk.mode == 'RGB' and chk.size == (size,size)
+              print('ICON OK', path, chk.size)
 
           source = Path('index.html').read_text(encoding='utf-8')
           source = source.replace('<head>', '<head>\n  <base href="/To-Do/">', 1)
           source = re.sub(r'\s*<link rel="manifest"[^>]*>', '', source)
           source = re.sub(r'\s*<link rel="(?:shortcut )?icon"[^>]*>', '', source)
           source = re.sub(r'\s*<link rel="apple-touch-icon(?:-precomposed)?"[^>]*>', '', source)
-          source = source.replace(
-              '<title>Note</title>',
-              '''<title>Note</title>\n  <link rel="manifest" href="/To-Do/app-v13/manifest.webmanifest">\n  <link rel="apple-touch-icon" sizes="180x180" href="/To-Do/app-v13/apple-touch-icon.png">\n  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/To-Do/app-v13/apple-touch-icon-precomposed.png">\n  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v13/icon-192.png">\n  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v13/icon-512.png">\n  <link rel="shortcut icon" href="/To-Do/app-v13/favicon.ico">''',
-              1
-          )
+          links = '''<title>Note</title>
+  <link rel="manifest" href="/To-Do/app-v14/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/To-Do/app-v14/apple-touch-icon-120.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/To-Do/app-v14/apple-touch-icon-120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/To-Do/app-v14/apple-touch-icon-152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/To-Do/app-v14/apple-touch-icon-167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/To-Do/app-v14/apple-touch-icon-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v14/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v14/icon-512.png">'''
+          source = source.replace('<title>Note</title>', links, 1)
           if 'name="mobile-web-app-capable"' not in source:
               source = source.replace(
                   '<meta name="apple-mobile-web-app-capable" content="yes">',
-                  '<meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="mobile-web-app-capable" content="yes">',
-                  1
-              )
+                  '<meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="mobile-web-app-capable" content="yes">', 1)
           (outdir/'index.html').write_text(source, encoding='utf-8')
 
-          (outdir/'manifest.webmanifest').write_text('''{
-            "id": "/To-Do/app-v13/",
+          manifest = '''{
+            "id": "/To-Do/app-v14/",
             "name": "Note",
             "short_name": "Note",
-            "start_url": "/To-Do/app-v13/",
-            "scope": "/To-Do/app-v13/",
+            "start_url": "/To-Do/app-v14/",
+            "scope": "/To-Do/app-v14/",
             "display": "standalone",
             "background_color": "#9fd8ff",
             "theme_color": "#5cb1fa",
             "icons": [
+              {"src":"./apple-touch-icon-120.png","sizes":"120x120","type":"image/png","purpose":"any"},
+              {"src":"./apple-touch-icon-152.png","sizes":"152x152","type":"image/png","purpose":"any"},
+              {"src":"./apple-touch-icon-167.png","sizes":"167x167","type":"image/png","purpose":"any"},
+              {"src":"./apple-touch-icon-180.png","sizes":"180x180","type":"image/png","purpose":"any"},
               {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
               {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}
             ]
           }
-          ''', encoding='utf-8')
-
-          (outdir/'sw.js').write_text('''
-          const CACHE='note-v13-cache-1';
-          self.addEventListener('install', e => { self.skipWaiting(); });
-          self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
-          self.addEventListener('fetch', e => {
-            if (e.request.method !== 'GET') return;
-            e.respondWith(fetch(e.request, {cache:'no-store'}).catch(() => caches.match(e.request)));
-          });
-          ''', encoding='utf-8')
-
-          final = (outdir/'index.html').read_text(encoding='utf-8')
-          assert '/To-Do/app-v13/apple-touch-icon.png' in final
-          assert '/To-Do/app-v13/manifest.webmanifest' in final
-          print('APP V13 READY')
+          '''
+          (outdir/'manifest.webmanifest').write_text(manifest, encoding='utf-8')
+          print('APP V14 READY')
           PY
 
-      - name: Salva app-v13 nel ramo main
+      - name: Salva app-v14 e fallback Apple nel ramo main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app-v13
+          git add app-v14 apple-touch-icon.png apple-touch-icon-precomposed.png
           if ! git diff --cached --quiet; then
-            git commit -m "Persist app-v13 iPhone assets"
+            git commit -m "Persist exact iPhone icons v14 [skip ci]"
             git push origin HEAD:main
-          else
-            echo "app-v13 già persistente nel ramo main"
           fi
-
-      - name: Attendi la pubblicazione automatica precedente
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          for i in $(seq 1 40); do
-            STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${GITHUB_SHA}&per_page=100" \
-              --jq '.workflow_runs[] | select(.name=="pages build and deployment") | .status' | head -n 1 || true)
-            echo "Pages automatico: ${STATUS:-non trovato}"
-            if [ -z "$STATUS" ] || [ "$STATUS" = "completed" ]; then
-              break
-            fi
-            sleep 3
-          done
-          sleep 5
 
       - name: Carica sito completo
         uses: actions/upload-pages-artifact@v3
         with:
           path: "."
 
-      - name: Pubblica per ultimo
+      - name: Pubblica
         id: deployment
         uses: actions/deploy-pages@v4
