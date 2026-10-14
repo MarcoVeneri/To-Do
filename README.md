@@ -2,4 +2,4 @@
 
 PWA personale sincronizzata.
 
-PWA icon build: Marco Hub To-do v8 final.
+Icona Home: stessa grafica To-do di Marco Hub (v8).
