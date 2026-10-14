@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <base href="/To-Do/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#edf4fb" media="(prefers-color-scheme:light)">
+  <meta name="theme-color" content="#191e24" media="(prefers-color-scheme:dark)">
+  <meta name="color-scheme" content="light dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Note">
+  <title>Note</title>
+  <link rel="manifest" href="/To-Do/app-v13/manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="/To-Do/app-v13/apple-touch-icon.png">
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/To-Do/app-v13/apple-touch-icon-precomposed.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v13/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v13/icon-512.png">
+  <link rel="shortcut icon" href="/To-Do/app-v13/favicon.ico">
+  <link rel="stylesheet" href="./styles.css?v=2.0.0">
+  <link rel="stylesheet" href="./interaction-fix.css?v=1.0.4">
+  <link rel="stylesheet" href="./large-screen.css?v=2">
+  <link rel="stylesheet" href="./replica.css?v=3">
+  <link rel="stylesheet" href="./theme-soft.css?v=1">
+  <link rel="stylesheet" href="./compact-layout.css?v=3">
+  <script src="./config.js?v=1.0.0"></script>
+</head>
+<body>
+  <div class="aurora auroraA"></div><div class="aurora auroraB"></div><div class="aurora auroraC"></div>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Navigazione">
+      <div class="brand"><div class="brandIcon">Q</div><strong>QuickList</strong></div>
+      <div class="sideNav active"><span>◈</span> To-do</div>
+      <div class="sideNav"><span>✓</span> Completate</div>
+      <div class="sideDivider"></div>
+      <div class="sideNav"><span>⚙</span> Impostazioni</div>
+      <div class="sideSync"><span class="syncDot"></span><span id="desktopSyncText">Sincronizzato</span></div>
+      <div class="sideQuote">Organizza la tua giornata.<br>Una cosa alla volta.</div>
+    </aside>
+
+    <main class="app" aria-live="polite">
+      <header class="header">
+        <div><h1>To-do</h1><p class="subtitle">Organizza la tua giornata</p><div id="syncStatus" class="syncStatus">Sincronizzazione…</div></div>
+        <button id="connectionBtn" class="connectionBtn" type="button" aria-label="Impostazioni sincronizzazione" title="Sincronizzazione"><span class="avatar">•••</span></button>
+      </header>
+
+      <section class="todoSection" aria-label="Da fare">
+        <div id="activeList" class="list"></div>
+        <div id="emptyActive" class="emptyState" hidden><div class="emptyIcon">✓</div><strong>Tutto fatto</strong><span>Aggiungi una nuova cosa da ricordare.</span></div>
+      </section>
+
+      <section id="completedSection" class="completedSection" aria-label="Completate">
+        <div class="completedHead"><h2>Completate</h2><button id="deleteCompletedBtn" class="deleteCompletedBtn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg><span>Svuota</span></button></div>
+        <div id="completedList" class="list completedList"></div>
+      </section>
+
+      <form id="addForm" class="addRow" autocomplete="off">
+        <input id="noteInput" maxlength="500" type="text" inputmode="text" enterkeyhint="done" placeholder="Scrivi qualcosa da ricordare..." aria-label="Nuova nota">
+        <button id="urgentBtn" class="urgentBtn" type="button" aria-pressed="false" aria-label="Segna la nuova nota come prioritaria" title="Priorità">
+          <svg class="composerSiren" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 15V9a4 4 0 0 1 8 0v6"/><path d="M6 15h12l1.5 3H4.5L6 15Z"/><path d="M12 2V1M4.9 4.9 4.2 4.2M19.1 4.9l.7-.7M2 10H1M23 10h-1"/></svg>
+        </button>
+        <button id="addBtn" class="addBtn" type="submit" aria-label="Salva nota">→</button>
+      </form>
+    </main>
+  </div>
+
+  <div id="setupOverlay" class="overlay" hidden><section class="modal setupModal" role="dialog" aria-modal="true" aria-labelledby="setupTitle"><div class="modalIcon">✓</div><h2 id="setupTitle">Attiva la sincronizzazione</h2><p>Inserisci il codice privato una sola volta su questo dispositivo.</p><input id="tokenInput" class="tokenInput" type="password" autocomplete="off" placeholder="Codice privato"><div id="setupMessage" class="setupMessage"></div><button id="saveTokenBtn" class="primaryBtn" type="button">Salva e sincronizza</button></section></div>
+  <div id="confirmOverlay" class="overlay" hidden><section class="modal confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle"><div class="trashCircle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg></div><h2 id="confirmTitle">Eliminare le completate?</h2><p>Le attività completate verranno eliminate definitivamente.</p><div class="confirmActions"><button id="cancelDeleteBtn" class="secondaryBtn" type="button">Annulla</button><button id="confirmDeleteBtn" class="dangerBtn" type="button">Elimina tutto</button></div></section></div>
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="./app.js?v=1.0.4"></script>
+  <script src="./interaction-fix.js?v=1.0.2"></script>
+  <script src="./row-cleanup.js?v=1"></script>
+  <script>(()=>{const desktopSync=document.getElementById('desktopSyncText'),sync=document.getElementById('syncStatus');const updateSync=()=>{if(desktopSync&&sync)desktopSync.textContent=sync.textContent};new MutationObserver(updateSync).observe(sync,{childList:true,characterData:true,subtree:true});updateSync()})();</script>
+</body>
+</html>
