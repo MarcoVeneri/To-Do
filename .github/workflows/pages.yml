@@ -3,13 +3,17 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
+  actions: read
+
 concurrency:
-  group: "pages"
+  group: "pages-custom"
   cancel-in-progress: true
+
 jobs:
   deploy:
     environment:
@@ -28,7 +32,7 @@ jobs:
       - name: Installa Pillow
         run: python3 -m pip install --disable-pip-version-check pillow
 
-      - name: Crea app iPhone v13 con icone locali verificate
+      - name: Crea app iPhone v13 persistente
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -38,7 +42,6 @@ jobs:
           outdir = Path('app-v13')
           outdir.mkdir(exist_ok=True)
 
-          # Icona piena, RGB, senza trasparenza: pensata per riempire tutto il quadrato iOS.
           S = 1024
           img = Image.new('RGB', (S, S), (92, 177, 250))
           px = img.load()
@@ -54,15 +57,11 @@ jobs:
 
           d = ImageDraw.Draw(img)
           blue = (29, 126, 243)
-          # pannello bianco grande, con bordo blu, senza margini inutili
           d.rounded_rectangle((118, 82, 906, 942), radius=170, fill=blue)
           d.rounded_rectangle((174, 138, 850, 886), radius=120, fill=(255, 255, 255))
-          # spunta
           d.line((285, 445, 390, 550), fill=blue, width=66)
           d.line((390, 550, 585, 326), fill=blue, width=66)
-          # trattino a destra
           d.rounded_rectangle((626, 456, 775, 516), radius=30, fill=blue)
-          # riga bassa
           d.rounded_rectangle((280, 655, 770, 719), radius=32, fill=blue)
 
           files = [
@@ -74,12 +73,10 @@ jobs:
           for size, path in files:
               img.resize((size,size), Image.Resampling.LANCZOS).save(path, 'PNG', optimize=True)
 
-          # favicon classico come ulteriore fallback
           img.resize((256,256), Image.Resampling.LANCZOS).save(
               outdir/'favicon.ico', format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)]
           )
 
-          # Verifica reale dei PNG prodotti.
           for size, path in files:
               chk = Image.open(path)
               chk.load()
@@ -88,7 +85,6 @@ jobs:
               assert chk.size == (size, size)
               print('ICON OK', path, chk.size, chk.mode)
 
-          # Pagina su percorso nuovo, ma usa gli stessi CSS/JS/dati della PWA originale.
           source = Path('index.html').read_text(encoding='utf-8')
           source = source.replace('<head>', '<head>\n  <base href="/To-Do/">', 1)
           source = re.sub(r'\s*<link rel="manifest"[^>]*>', '', source)
@@ -96,7 +92,7 @@ jobs:
           source = re.sub(r'\s*<link rel="apple-touch-icon(?:-precomposed)?"[^>]*>', '', source)
           source = source.replace(
               '<title>Note</title>',
-              '''<title>Note</title>\n  <link rel="manifest" href="/To-Do/app-v13/manifest.webmanifest">\n  <link rel="apple-touch-icon" href="/To-Do/app-v13/apple-touch-icon.png">\n  <link rel="apple-touch-icon-precomposed" href="/To-Do/app-v13/apple-touch-icon-precomposed.png">\n  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v13/icon-192.png">\n  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v13/icon-512.png">\n  <link rel="shortcut icon" href="/To-Do/app-v13/favicon.ico">''',
+              '''<title>Note</title>\n  <link rel="manifest" href="/To-Do/app-v13/manifest.webmanifest">\n  <link rel="apple-touch-icon" sizes="180x180" href="/To-Do/app-v13/apple-touch-icon.png">\n  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/To-Do/app-v13/apple-touch-icon-precomposed.png">\n  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v13/icon-192.png">\n  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v13/icon-512.png">\n  <link rel="shortcut icon" href="/To-Do/app-v13/favicon.ico">''',
               1
           )
           if 'name="mobile-web-app-capable"' not in source:
@@ -123,18 +119,54 @@ jobs:
           }
           ''', encoding='utf-8')
 
-          # Controllo che la pagina nuova punti solo alle icone nuove.
+          (outdir/'sw.js').write_text('''
+          const CACHE='note-v13-cache-1';
+          self.addEventListener('install', e => { self.skipWaiting(); });
+          self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+          self.addEventListener('fetch', e => {
+            if (e.request.method !== 'GET') return;
+            e.respondWith(fetch(e.request, {cache:'no-store'}).catch(() => caches.match(e.request)));
+          });
+          ''', encoding='utf-8')
+
           final = (outdir/'index.html').read_text(encoding='utf-8')
           assert '/To-Do/app-v13/apple-touch-icon.png' in final
           assert '/To-Do/app-v13/manifest.webmanifest' in final
           print('APP V13 READY')
           PY
 
-      - name: Carica sito
+      - name: Salva app-v13 nel ramo main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app-v13
+          if ! git diff --cached --quiet; then
+            git commit -m "Persist app-v13 iPhone assets"
+            git push origin HEAD:main
+          else
+            echo "app-v13 già persistente nel ramo main"
+          fi
+
+      - name: Attendi la pubblicazione automatica precedente
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 40); do
+            STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${GITHUB_SHA}&per_page=100" \
+              --jq '.workflow_runs[] | select(.name=="pages build and deployment") | .status' | head -n 1 || true)
+            echo "Pages automatico: ${STATUS:-non trovato}"
+            if [ -z "$STATUS" ] || [ "$STATUS" = "completed" ]; then
+              break
+            fi
+            sleep 3
+          done
+          sleep 5
+
+      - name: Carica sito completo
         uses: actions/upload-pages-artifact@v3
         with:
           path: "."
 
-      - name: Pubblica
+      - name: Pubblica per ultimo
         id: deployment
         uses: actions/deploy-pages@v4
