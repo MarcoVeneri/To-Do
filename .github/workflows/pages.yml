@@ -28,122 +28,106 @@ jobs:
       - name: Installa Pillow
         run: python3 -m pip install --disable-pip-version-check pillow
 
-      - name: Genera icone PWA v12
-        run: |
-          python3 - <<'PY'
-          from PIL import Image, ImageDraw, ImageFilter
-
-          S = 1024
-          img = Image.new('RGB', (S, S), '#91ccff')
-          px = img.load()
-
-          # sfondo azzurro/blu che riempie tutto il quadrato
-          for y in range(S):
-              for x in range(S):
-                  t = (x + y) / (2*(S-1))
-                  r = int(220*(1-t) + 82*t)
-                  g = int(243*(1-t) + 169*t)
-                  b = int(255*(1-t) + 246*t)
-                  px[x,y] = (r,g,b)
-
-          # riflesso morbido
-          glow = Image.new('RGBA', (S,S), (0,0,0,0))
-          gd = ImageDraw.Draw(glow)
-          gd.ellipse((-180,-260,850,520), fill=(255,255,255,85))
-          glow = glow.filter(ImageFilter.GaussianBlur(45))
-          img = Image.alpha_composite(img.convert('RGBA'), glow)
-
-          d = ImageDraw.Draw(img)
-
-          # riquadro centrale bianco con bordo blu spesso
-          outer = (142, 92, 882, 920)
-          radius = 150
-          d.rounded_rectangle(outer, radius=radius, fill=(30,132,245,255))
-          inner = (198, 148, 826, 864)
-          d.rounded_rectangle(inner, radius=112, fill=(255,255,255,255))
-
-          blue = (28,127,242,255)
-
-          # spunta grande
-          d.line((300, 450, 385, 535), fill=blue, width=62)
-          d.line((385, 535, 560, 335), fill=blue, width=62)
-
-          # trattino a destra
-          d.rounded_rectangle((602, 452, 758, 512), radius=28, fill=blue)
-
-          # linea orizzontale in basso
-          d.rounded_rectangle((285, 640, 755, 700), radius=28, fill=blue)
-
-          # sottile luce interna
-          hi = Image.new('RGBA', (S,S), (0,0,0,0))
-          hd = ImageDraw.Draw(hi)
-          hd.arc((25,25,999,999), 205, 335, fill=(255,255,255,70), width=22)
-          img = Image.alpha_composite(img, hi).convert('RGB')
-
-          for size, name in [
-              (180, 'note-icon-180-v12.png'),
-              (192, 'note-icon-192-v12.png'),
-              (512, 'note-icon-512-v12.png')]:
-              out = img.resize((size,size), Image.Resampling.LANCZOS)
-              out.save(name, 'PNG', optimize=True)
-
-          # nomi standard, utili anche come fallback Safari
-          img.resize((180,180), Image.Resampling.LANCZOS).save('apple-touch-icon.png', 'PNG', optimize=True)
-          img.resize((180,180), Image.Resampling.LANCZOS).save('apple-touch-icon-precomposed.png', 'PNG', optimize=True)
-
-          # verifica reale: se un PNG è corrotto il workflow fallisce qui
-          for name, expected in [
-              ('note-icon-180-v12.png',(180,180)),
-              ('note-icon-192-v12.png',(192,192)),
-              ('note-icon-512-v12.png',(512,512)),
-              ('apple-touch-icon.png',(180,180))]:
-              chk = Image.open(name)
-              chk.load()
-              assert chk.size == expected
-              assert chk.format == 'PNG'
-              print('OK', name, chk.size, chk.mode)
-          PY
-
-      - name: Configura PWA iPhone v12
+      - name: Crea app iPhone v13 con icone locali verificate
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          from PIL import Image, ImageDraw
           import re
 
-          p = Path('index.html')
-          s = p.read_text(encoding='utf-8')
+          outdir = Path('app-v13')
+          outdir.mkdir(exist_ok=True)
 
-          s = re.sub(r'<link rel="manifest"[^>]*>',
-                     '<link rel="manifest" href="/To-Do/manifest.webmanifest?v=12">', s, count=1)
-          s = re.sub(r'<link rel="icon" sizes="180x180"[^>]*>',
-                     '<link rel="icon" sizes="180x180" href="/To-Do/note-icon-180-v12.png" type="image/png">', s, count=1)
-          s = re.sub(r'<link rel="apple-touch-icon"[^>]*>',
-                     '<link rel="apple-touch-icon" sizes="180x180" href="/To-Do/note-icon-180-v12.png">', s, count=1)
-          s = re.sub(r'<link rel="icon" sizes="192x192"[^>]*>',
-                     '<link rel="icon" sizes="192x192" href="/To-Do/note-icon-192-v12.png" type="image/png">', s, count=1)
-          s = re.sub(r'\s*<link rel="icon" sizes="512x512"[^>]*>', '', s, count=1)
+          # Icona piena, RGB, senza trasparenza: pensata per riempire tutto il quadrato iOS.
+          S = 1024
+          img = Image.new('RGB', (S, S), (92, 177, 250))
+          px = img.load()
+          for y in range(S):
+              for x in range(S):
+                  t = (0.58*x + 0.42*y) / (S-1)
+                  t = max(0, min(1, t))
+                  px[x, y] = (
+                      int(175*(1-t) + 70*t),
+                      int(222*(1-t) + 153*t),
+                      int(255*(1-t) + 244*t)
+                  )
 
-          if 'apple-touch-icon-precomposed' not in s:
-              marker = '<link rel="apple-touch-icon" sizes="180x180" href="/To-Do/note-icon-180-v12.png">'
-              s = s.replace(marker, marker + '\n  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/To-Do/note-icon-180-v12.png">', 1)
+          d = ImageDraw.Draw(img)
+          blue = (29, 126, 243)
+          # pannello bianco grande, con bordo blu, senza margini inutili
+          d.rounded_rectangle((118, 82, 906, 942), radius=170, fill=blue)
+          d.rounded_rectangle((174, 138, 850, 886), radius=120, fill=(255, 255, 255))
+          # spunta
+          d.line((285, 445, 390, 550), fill=blue, width=66)
+          d.line((390, 550, 585, 326), fill=blue, width=66)
+          # trattino a destra
+          d.rounded_rectangle((626, 456, 775, 516), radius=30, fill=blue)
+          # riga bassa
+          d.rounded_rectangle((280, 655, 770, 719), radius=32, fill=blue)
 
-          p.write_text(s, encoding='utf-8')
+          files = [
+              (180, outdir/'apple-touch-icon.png'),
+              (180, outdir/'apple-touch-icon-precomposed.png'),
+              (192, outdir/'icon-192.png'),
+              (512, outdir/'icon-512.png'),
+          ]
+          for size, path in files:
+              img.resize((size,size), Image.Resampling.LANCZOS).save(path, 'PNG', optimize=True)
 
-          Path('manifest.webmanifest').write_text('''{
-            "id": "/To-Do/note-v12",
+          # favicon classico come ulteriore fallback
+          img.resize((256,256), Image.Resampling.LANCZOS).save(
+              outdir/'favicon.ico', format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)]
+          )
+
+          # Verifica reale dei PNG prodotti.
+          for size, path in files:
+              chk = Image.open(path)
+              chk.load()
+              assert chk.format == 'PNG'
+              assert chk.mode == 'RGB'
+              assert chk.size == (size, size)
+              print('ICON OK', path, chk.size, chk.mode)
+
+          # Pagina su percorso nuovo, ma usa gli stessi CSS/JS/dati della PWA originale.
+          source = Path('index.html').read_text(encoding='utf-8')
+          source = source.replace('<head>', '<head>\n  <base href="/To-Do/">', 1)
+          source = re.sub(r'\s*<link rel="manifest"[^>]*>', '', source)
+          source = re.sub(r'\s*<link rel="(?:shortcut )?icon"[^>]*>', '', source)
+          source = re.sub(r'\s*<link rel="apple-touch-icon(?:-precomposed)?"[^>]*>', '', source)
+          source = source.replace(
+              '<title>Note</title>',
+              '''<title>Note</title>\n  <link rel="manifest" href="/To-Do/app-v13/manifest.webmanifest">\n  <link rel="apple-touch-icon" href="/To-Do/app-v13/apple-touch-icon.png">\n  <link rel="apple-touch-icon-precomposed" href="/To-Do/app-v13/apple-touch-icon-precomposed.png">\n  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v13/icon-192.png">\n  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v13/icon-512.png">\n  <link rel="shortcut icon" href="/To-Do/app-v13/favicon.ico">''',
+              1
+          )
+          if 'name="mobile-web-app-capable"' not in source:
+              source = source.replace(
+                  '<meta name="apple-mobile-web-app-capable" content="yes">',
+                  '<meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="mobile-web-app-capable" content="yes">',
+                  1
+              )
+          (outdir/'index.html').write_text(source, encoding='utf-8')
+
+          (outdir/'manifest.webmanifest').write_text('''{
+            "id": "/To-Do/app-v13/",
             "name": "Note",
             "short_name": "Note",
-            "start_url": "/To-Do/?note=12",
-            "scope": "/To-Do/",
+            "start_url": "/To-Do/app-v13/",
+            "scope": "/To-Do/app-v13/",
             "display": "standalone",
-            "background_color": "#9fd5ff",
-            "theme_color": "#6eb7fb",
+            "background_color": "#9fd8ff",
+            "theme_color": "#5cb1fa",
             "icons": [
-              {"src":"/To-Do/note-icon-192-v12.png","sizes":"192x192","type":"image/png","purpose":"any"},
-              {"src":"/To-Do/note-icon-512-v12.png","sizes":"512x512","type":"image/png","purpose":"any"}
+              {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+              {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}
             ]
           }
           ''', encoding='utf-8')
+
+          # Controllo che la pagina nuova punti solo alle icone nuove.
+          final = (outdir/'index.html').read_text(encoding='utf-8')
+          assert '/To-Do/app-v13/apple-touch-icon.png' in final
+          assert '/To-Do/app-v13/manifest.webmanifest' in final
+          print('APP V13 READY')
           PY
 
       - name: Carica sito
