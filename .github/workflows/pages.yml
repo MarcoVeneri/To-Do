@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -28,29 +28,23 @@ jobs:
         with:
           enablement: true
 
-      - name: Prepara la sola PWA reale con il fix iOS 27.2 già verificato
+      - name: Fissa definitivamente l'icona iOS nella PWA reale
         run: |
-          mkdir -p _site
-          rsync -a \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'scripts' \
-            --exclude '_site' \
-            --exclude 'app-v13' \
-            --exclude 'app-v14' \
-            --exclude 'app-v15' \
-            ./ _site/
-
           python3 - <<'PY'
           from pathlib import Path
-          import base64, re, struct
+          import base64, re, struct, shutil
 
-          root = Path('_site')
-          index = root / 'index.html'
+          index = Path('index.html')
+          canonical_icon = Path('ios-home-icon.png')
+          old_working_icon = Path('app-v14/apple-touch-icon-180.png')
 
-          # È ESATTAMENTE il PNG 180x180 che ieri ha funzionato nella v15.
-          icon = Path('app-v14/apple-touch-icon-180.png')
-          raw = icon.read_bytes()
+          # Prima esecuzione: conserva come asset canonico ESATTAMENTE il PNG
+          # che il 14/10 ha funzionato su iOS 27.2.
+          if not canonical_icon.exists():
+              assert old_working_icon.exists(), 'Missing proven iOS icon source'
+              shutil.copyfile(old_working_icon, canonical_icon)
+
+          raw = canonical_icon.read_bytes()
           assert raw[:8] == b'\x89PNG\r\n\x1a\n'
           width, height = struct.unpack('>II', raw[16:24])
           assert (width, height) == (180, 180)
@@ -58,19 +52,50 @@ jobs:
           html = index.read_text(encoding='utf-8')
           data_uri = 'data:image/png;base64,' + base64.b64encode(raw).decode('ascii')
 
-          # Come nella v15 riuscita: una sola apple-touch-icon e incorporata nell'HTML.
+          # Una sola apple-touch-icon, inline nel VERO index.html del repository.
           html = re.sub(r'\s*<link rel="apple-touch-icon(?:-precomposed)?"[^>]*>', '', html)
           marker = '<title>Note</title>'
+          assert marker in html
           html = html.replace(marker, marker + '\n  <link rel="apple-touch-icon" sizes="180x180" href="' + data_uri + '">', 1)
           index.write_text(html, encoding='utf-8')
 
           final = index.read_text(encoding='utf-8')
           assert final.count('rel="apple-touch-icon"') == 1
           assert 'data:image/png;base64,' in final
-          assert not (root / 'app-v13').exists()
-          assert not (root / 'app-v14').exists()
-          assert not (root / 'app-v15').exists()
-          print('Exact proven iOS icon fix applied to canonical /To-Do/')
+          print('Canonical source now contains the proven inline iOS icon')
+          PY
+
+          # Le vecchie app-vXX non sono più applicazioni pubblicate né sorgenti.
+          rm -rf app-v13 app-v14 app-v15
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html ios-home-icon.png
+          git add -A app-v13 app-v14 app-v15 || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Persist proven iOS Home icon in canonical To-Do [skip ci]"
+            git push origin HEAD:main
+          fi
+
+      - name: Prepara soltanto la PWA canonica
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'scripts' \
+            --exclude '_site' \
+            ./ _site/
+
+          python3 - <<'PY'
+          from pathlib import Path
+          html = Path('_site/index.html').read_text(encoding='utf-8')
+          assert html.count('rel="apple-touch-icon"') == 1
+          assert 'data:image/png;base64,' in html
+          assert not (Path('_site') / 'app-v13').exists()
+          assert not (Path('_site') / 'app-v14').exists()
+          assert not (Path('_site') / 'app-v15').exists()
+          print('Deploy contains one real To-Do PWA and the inline iOS icon')
           PY
 
       - name: Carica sito canonico
