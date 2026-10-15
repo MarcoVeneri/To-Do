@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -28,105 +28,7 @@ jobs:
         with:
           enablement: true
 
-      - name: Installa Pillow
-        run: python3 -m pip install --disable-pip-version-check pillow
-
-      - name: Crea app iPhone v14 con tutte le misure Apple
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          from PIL import Image, ImageDraw
-          import re, shutil
-
-          outdir = Path('app-v14')
-          outdir.mkdir(exist_ok=True)
-
-          S = 1024
-          img = Image.new('RGB', (S, S), (92, 177, 250))
-          px = img.load()
-          for y in range(S):
-              for x in range(S):
-                  t = max(0, min(1, (0.58*x + 0.42*y)/(S-1)))
-                  px[x,y] = (int(175*(1-t)+70*t), int(222*(1-t)+153*t), int(255*(1-t)+244*t))
-
-          d = ImageDraw.Draw(img)
-          blue = (29,126,243)
-          d.rounded_rectangle((118,82,906,942), radius=170, fill=blue)
-          d.rounded_rectangle((174,138,850,886), radius=120, fill=(255,255,255))
-          d.line((285,445,390,550), fill=blue, width=66)
-          d.line((390,550,585,326), fill=blue, width=66)
-          d.rounded_rectangle((626,456,775,516), radius=30, fill=blue)
-          d.rounded_rectangle((280,655,770,719), radius=32, fill=blue)
-
-          for size in [120,152,167,180,192,512]:
-              name = f'icon-{size}.png' if size in (192,512) else f'apple-touch-icon-{size}.png'
-              img.resize((size,size), Image.Resampling.LANCZOS).save(outdir/name, 'PNG', optimize=True)
-
-          shutil.copyfile(outdir/'apple-touch-icon-120.png', outdir/'apple-touch-icon.png')
-          shutil.copyfile(outdir/'apple-touch-icon-120.png', Path('apple-touch-icon.png'))
-
-          for size in [120,152,167,180,192,512]:
-              path = outdir/(f'icon-{size}.png' if size in (192,512) else f'apple-touch-icon-{size}.png')
-              chk = Image.open(path); chk.load()
-              assert chk.format == 'PNG' and chk.mode == 'RGB' and chk.size == (size,size)
-              print('ICON OK', path, chk.size)
-
-          source = Path('index.html').read_text(encoding='utf-8')
-          source = source.replace('<head>', '<head>\n  <base href="/To-Do/">', 1)
-          source = re.sub(r'\s*<link rel="manifest"[^>]*>', '', source)
-          source = re.sub(r'\s*<link rel="(?:shortcut )?icon"[^>]*>', '', source)
-          source = re.sub(r'\s*<link rel="apple-touch-icon(?:-precomposed)?"[^>]*>', '', source)
-          links = (
-              '<title>Note</title>\n'
-              '  <link rel="manifest" href="/To-Do/app-v14/manifest.webmanifest">\n'
-              '  <link rel="apple-touch-icon" href="/To-Do/app-v14/apple-touch-icon-120.png">\n'
-              '  <link rel="apple-touch-icon" sizes="120x120" href="/To-Do/app-v14/apple-touch-icon-120.png">\n'
-              '  <link rel="apple-touch-icon" sizes="152x152" href="/To-Do/app-v14/apple-touch-icon-152.png">\n'
-              '  <link rel="apple-touch-icon" sizes="167x167" href="/To-Do/app-v14/apple-touch-icon-167.png">\n'
-              '  <link rel="apple-touch-icon" sizes="180x180" href="/To-Do/app-v14/apple-touch-icon-180.png">\n'
-              '  <link rel="icon" type="image/png" sizes="192x192" href="/To-Do/app-v14/icon-192.png">\n'
-              '  <link rel="icon" type="image/png" sizes="512x512" href="/To-Do/app-v14/icon-512.png">'
-          )
-          source = source.replace('<title>Note</title>', links, 1)
-          if 'name="mobile-web-app-capable"' not in source:
-              source = source.replace('<meta name="apple-mobile-web-app-capable" content="yes">', '<meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="mobile-web-app-capable" content="yes">', 1)
-          (outdir/'index.html').write_text(source, encoding='utf-8')
-
-          manifest = (
-              '{\n'
-              '  "id": "/To-Do/app-v14/",\n'
-              '  "name": "Note",\n'
-              '  "short_name": "Note",\n'
-              '  "start_url": "/To-Do/app-v14/",\n'
-              '  "scope": "/To-Do/app-v14/",\n'
-              '  "display": "standalone",\n'
-              '  "background_color": "#9fd8ff",\n'
-              '  "theme_color": "#5cb1fa",\n'
-              '  "icons": [\n'
-              '    {"src":"./apple-touch-icon-120.png","sizes":"120x120","type":"image/png","purpose":"any"},\n'
-              '    {"src":"./apple-touch-icon-152.png","sizes":"152x152","type":"image/png","purpose":"any"},\n'
-              '    {"src":"./apple-touch-icon-167.png","sizes":"167x167","type":"image/png","purpose":"any"},\n'
-              '    {"src":"./apple-touch-icon-180.png","sizes":"180x180","type":"image/png","purpose":"any"},\n'
-              '    {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},\n'
-              '    {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}\n'
-              '  ]\n'
-              '}\n'
-          )
-          (outdir/'manifest.webmanifest').write_text(manifest, encoding='utf-8')
-          print('APP V14 READY')
-          PY
-
-      - name: Salva app-v14 e fallback Apple nel ramo main
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app-v14 apple-touch-icon.png
-          if ! git diff --cached --quiet; then
-            git commit -m "Persist exact iPhone icons v14 [skip ci]"
-            git push origin HEAD:main
-          fi
-
-      - name: Carica sito completo
+      - name: Carica sito canonico
         uses: actions/upload-pages-artifact@v3
         with:
           path: "."
