@@ -1,8 +1,8 @@
 {
-  "id": "/To-Do/",
+  "id": "/To-Do/?pwa=20261015-2",
   "name": "Note",
   "short_name": "Note",
-  "start_url": "/To-Do/",
+  "start_url": "/To-Do/?pwa=20261015-2",
   "scope": "/To-Do/",
   "display": "standalone",
   "background_color": "#9fd8ff",
