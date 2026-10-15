@@ -28,7 +28,7 @@ jobs:
         with:
           enablement: true
 
-      - name: Prepara solo la PWA canonica e incorpora icona iOS
+      - name: Prepara la sola PWA reale con il fix iOS 27.2 già verificato
         run: |
           mkdir -p _site
           rsync -a \
@@ -43,15 +43,22 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
-          import base64, re
+          import base64, re, struct
 
           root = Path('_site')
           index = root / 'index.html'
-          icon = root / 'hub-todo-180-v8.png'
+
+          # È ESATTAMENTE il PNG 180x180 che ieri ha funzionato nella v15.
+          icon = Path('app-v14/apple-touch-icon-180.png')
+          raw = icon.read_bytes()
+          assert raw[:8] == b'\x89PNG\r\n\x1a\n'
+          width, height = struct.unpack('>II', raw[16:24])
+          assert (width, height) == (180, 180)
 
           html = index.read_text(encoding='utf-8')
-          data_uri = 'data:image/png;base64,' + base64.b64encode(icon.read_bytes()).decode('ascii')
+          data_uri = 'data:image/png;base64,' + base64.b64encode(raw).decode('ascii')
 
+          # Come nella v15 riuscita: una sola apple-touch-icon e incorporata nell'HTML.
           html = re.sub(r'\s*<link rel="apple-touch-icon(?:-precomposed)?"[^>]*>', '', html)
           marker = '<title>Note</title>'
           html = html.replace(marker, marker + '\n  <link rel="apple-touch-icon" sizes="180x180" href="' + data_uri + '">', 1)
@@ -63,7 +70,7 @@ jobs:
           assert not (root / 'app-v13').exists()
           assert not (root / 'app-v14').exists()
           assert not (root / 'app-v15').exists()
-          print('Canonical To-Do ready with inline iOS icon')
+          print('Exact proven iOS icon fix applied to canonical /To-Do/')
           PY
 
       - name: Carica sito canonico
