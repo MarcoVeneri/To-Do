@@ -28,10 +28,48 @@ jobs:
         with:
           enablement: true
 
+      - name: Prepara solo la PWA canonica e incorpora icona iOS
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'scripts' \
+            --exclude '_site' \
+            --exclude 'app-v13' \
+            --exclude 'app-v14' \
+            --exclude 'app-v15' \
+            ./ _site/
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, re
+
+          root = Path('_site')
+          index = root / 'index.html'
+          icon = root / 'hub-todo-180-v8.png'
+
+          html = index.read_text(encoding='utf-8')
+          data_uri = 'data:image/png;base64,' + base64.b64encode(icon.read_bytes()).decode('ascii')
+
+          html = re.sub(r'\s*<link rel="apple-touch-icon(?:-precomposed)?"[^>]*>', '', html)
+          marker = '<title>Note</title>'
+          html = html.replace(marker, marker + '\n  <link rel="apple-touch-icon" sizes="180x180" href="' + data_uri + '">', 1)
+          index.write_text(html, encoding='utf-8')
+
+          final = index.read_text(encoding='utf-8')
+          assert final.count('rel="apple-touch-icon"') == 1
+          assert 'data:image/png;base64,' in final
+          assert not (root / 'app-v13').exists()
+          assert not (root / 'app-v14').exists()
+          assert not (root / 'app-v15').exists()
+          print('Canonical To-Do ready with inline iOS icon')
+          PY
+
       - name: Carica sito canonico
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: "_site"
 
       - name: Pubblica
         id: deployment
