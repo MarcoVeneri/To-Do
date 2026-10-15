@@ -1,15 +1,16 @@
 {
-  "id": "./?note=64",
+  "id": "/To-Do/",
   "name": "Note",
   "short_name": "Note",
-  "start_url": "./?note=64",
-  "scope": "./",
+  "start_url": "/To-Do/",
+  "scope": "/To-Do/",
   "display": "standalone",
   "background_color": "#edf4fb",
   "theme_color": "#edf4fb",
   "description": "Note sincronizzate.",
   "icons": [
-    {"src":"./hub-icon-192-v64.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"./hub-icon-512-v64.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {"src":"/To-Do/hub-todo-180-v8.png?v=65","sizes":"180x180","type":"image/png","purpose":"any"},
+    {"src":"/To-Do/hub-todo-192-v8.png?v=65","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/To-Do/hub-todo-512-v8.png?v=65","sizes":"512x512","type":"image/png","purpose":"any"}
   ]
 }
