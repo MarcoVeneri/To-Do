@@ -1,0 +1,16 @@
+/* Priority colors: normal notes use one green marker; urgent notes use red. */
+.taskRow:not(.urgent)::before,
+.taskRow:not(.urgent):nth-child(2n)::before,
+.taskRow:not(.urgent):nth-child(3n)::before,
+.taskRow:not(.urgent):nth-child(4n)::before{
+  background:#62b98d!important;
+  box-shadow:none!important;
+}
+
+.taskRow.urgent::before,
+.taskRow.urgent:nth-child(2n)::before,
+.taskRow.urgent:nth-child(3n)::before,
+.taskRow.urgent:nth-child(4n)::before{
+  background:#ef5d66!important;
+  box-shadow:none!important;
+}
