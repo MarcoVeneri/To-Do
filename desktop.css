@@ -36,11 +36,10 @@
     grid-template-columns:minmax(0,1.16fr) minmax(360px,.84fr);
     grid-template-areas:
       "header header"
-      "composer composer"
       "active completed";
     column-gap:30px;
     row-gap:0;
-    padding:30px 34px 34px!important;
+    padding:30px 34px 132px!important;
     border-radius:30px;
     background:rgba(255,255,255,.34);
     box-shadow:0 24px 70px rgba(27,43,75,.055);
@@ -58,19 +57,22 @@
   }
 
   .addRow{
-    grid-area:composer;
-    position:static!important;
-    inset:auto!important;
-    width:100%!important;
-    max-width:none!important;
-    margin:0 0 26px!important;
-    padding:0!important;
-    border:0!important;
-    border-radius:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    backdrop-filter:none!important;
-    -webkit-backdrop-filter:none!important;
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    bottom:24px!important;
+    transform:translateX(-50%);
+    z-index:60;
+    width:min(calc(100vw - 96px),1112px)!important;
+    max-width:1112px!important;
+    margin:0!important;
+    padding:8px!important;
+    border:1px solid rgba(255,255,255,.60)!important;
+    border-radius:20px!important;
+    background:rgba(255,255,255,.72)!important;
+    box-shadow:0 14px 34px rgba(50,70,110,.18),inset 0 1px 0 rgba(255,255,255,.58)!important;
+    backdrop-filter:blur(22px) saturate(160%)!important;
+    -webkit-backdrop-filter:blur(22px) saturate(160%)!important;
     grid-template-columns:minmax(0,1fr) 54px 62px;
     gap:10px;
   }
@@ -186,6 +188,10 @@
     padding-left:40px!important;
     padding-right:40px!important;
   }
+  .addRow{
+    width:min(calc(100vw - 112px),1200px)!important;
+    max-width:1200px!important;
+  }
   .completedSection{padding-left:36px}
 }
 
@@ -200,5 +206,10 @@
   }
   .completedRow:hover{
     background:#172235;
+  }
+  .addRow{
+    background:rgba(19,29,46,.90)!important;
+    border-color:rgba(83,103,132,.45)!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06)!important;
   }
 }
