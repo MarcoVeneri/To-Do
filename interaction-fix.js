@@ -29,29 +29,14 @@ if(syncBtn){
   },true);
 }
 
-// Su iPhone/iPad la barra di inserimento viene sganciata dal contenitore
-// dell'app e portata direttamente sotto <body>. In questo modo position:fixed
-// resta davvero ancorato al viewport e l'elenco può scorrere dietro la barra.
+// La barra di inserimento viene sempre sganciata dal contenitore dell'app
+// e portata direttamente sotto <body>, sia su mobile sia su desktop/Edge.
+// In questo modo position:fixed resta realmente ancorato al viewport anche
+// quando i contenitori dell'interfaccia usano blur/backdrop-filter/overflow.
 const composer=document.querySelector("#addForm");
-const app=document.querySelector("main.app");
-if(composer&&app){
-  const home=document.createComment("todo-composer-home");
-  app.insertBefore(home,composer);
-  const mobileQuery=window.matchMedia("(max-width: 760px)");
-
-  const placeComposer=()=>{
-    if(mobileQuery.matches){
-      if(composer.parentElement!==document.body)document.body.appendChild(composer);
-      document.body.classList.add("todoComposerDetached");
-    }else{
-      if(home.parentNode&&composer.parentElement!==app)home.parentNode.insertBefore(composer,home.nextSibling);
-      document.body.classList.remove("todoComposerDetached");
-    }
-  };
-
-  placeComposer();
-  if(typeof mobileQuery.addEventListener==="function")mobileQuery.addEventListener("change",placeComposer);
-  else if(typeof mobileQuery.addListener==="function")mobileQuery.addListener(placeComposer);
+if(composer){
+  if(composer.parentElement!==document.body)document.body.appendChild(composer);
+  document.body.classList.add("todoComposerDetached");
 }
 
 // La barra di inserimento resta sempre fissa: nessun riposizionamento
